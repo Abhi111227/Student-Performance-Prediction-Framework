@@ -1,0 +1,68 @@
+[
+    {
+        "Model":"Linear Regression (OLS)",
+        "Train R2":0.903,
+        "Test R2":0.9064,
+        "Adjusted R2":0.9027,
+        "MAE":4.0298,
+        "MSE":25.4341,
+        "RMSE":5.0432,
+        "5-Fold CV R2 (Mean)":0.8984,
+        "CV Std":0.015
+    },
+    {
+        "Model":"Ridge Regression (L2)",
+        "Train R2":0.903,
+        "Test R2":0.9064,
+        "Adjusted R2":0.9027,
+        "MAE":4.0306,
+        "MSE":25.4377,
+        "RMSE":5.0436,
+        "5-Fold CV R2 (Mean)":0.8984,
+        "CV Std":0.015
+    },
+    {
+        "Model":"Lasso Regression (L1)",
+        "Train R2":0.903,
+        "Test R2":0.9062,
+        "Adjusted R2":0.9025,
+        "MAE":4.039,
+        "MSE":25.5024,
+        "RMSE":5.05,
+        "5-Fold CV R2 (Mean)":0.8984,
+        "CV Std":0.015
+    },
+    {
+        "Model":"Gradient Boosting Regressor",
+        "Train R2":0.9467,
+        "Test R2":0.8663,
+        "Adjusted R2":0.861,
+        "MAE":4.7634,
+        "MSE":36.3501,
+        "RMSE":6.0291,
+        "5-Fold CV R2 (Mean)":0.8681,
+        "CV Std":0.0125
+    },
+    {
+        "Model":"Random Forest Regressor",
+        "Train R2":0.9537,
+        "Test R2":0.8499,
+        "Adjusted R2":0.844,
+        "MAE":5.0829,
+        "MSE":40.7897,
+        "RMSE":6.3867,
+        "5-Fold CV R2 (Mean)":0.8532,
+        "CV Std":0.0165
+    },
+    {
+        "Model":"Decision Tree Regressor",
+        "Train R2":0.912,
+        "Test R2":0.7758,
+        "Adjusted R2":0.7669,
+        "MAE":6.1485,
+        "MSE":60.9416,
+        "RMSE":7.8065,
+        "5-Fold CV R2 (Mean)":0.7804,
+        "CV Std":0.0397
+    }
+]

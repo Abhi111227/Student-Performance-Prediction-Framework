@@ -1,0 +1,26 @@
+{
+    "best_model_name": "Linear Regression (OLS)",
+    "features": [
+        "Study_Hours",
+        "Attendance",
+        "Assignments_Completed"
+    ],
+    "intercept": 3.4209208465905334,
+    "coefficients": {
+        "Study_Hours": 4.763857400870915,
+        "Attendance": 0.37954872989919486,
+        "Assignments_Completed": 1.966901149964639
+    },
+    "formula": "Exam_Score = 3.4209 + (4.7639 * Study_Hours) + (0.3795 * Attendance) + (1.9669 * Assignments_Completed)",
+    "metrics": {
+        "Model": "Linear Regression (OLS)",
+        "Train R2": 0.903,
+        "Test R2": 0.9064,
+        "Adjusted R2": 0.9027,
+        "MAE": 4.0298,
+        "MSE": 25.4341,
+        "RMSE": 5.0432,
+        "5-Fold CV R2 (Mean)": 0.8984,
+        "CV Std": 0.015
+    }
+}
