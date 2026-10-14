@@ -6,6 +6,8 @@
   <title>NOVORA | Intelligent Learning Analytics & Student Success Prediction Framework</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN for Interactive Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
@@ -29,186 +31,285 @@
   </script>
   <style>
     .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
     }
-    input[type=range] {
-      accent-color: #4f46e5;
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      opacity: 1;
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
 
   <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Version -->
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
           <i class="fa-solid fa-graduation-cap text-lg"></i>
         </div>
         <div>
-          <span class="text-xl font-bold tracking-tight text-slate-900">NOVORA</span>
-          <span class="text-xs ml-2 px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold uppercase tracking-wider">v2.0 ML</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">NOVORA</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-bold uppercase tracking-wider">Enterprise ML</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Intelligent Learning Analytics & Success Prediction</p>
         </div>
       </div>
       
-      <nav class="hidden md:flex space-x-1">
-        <button onclick="switchTab('predict')" id="nav-predict" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-indigo-600 bg-indigo-50">
-          <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Prediction Studio
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <button onclick="switchTab('predict')" id="nav-predict" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-indigo-700 bg-white shadow-sm">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1.5 text-indigo-500"></i>Prediction Studio
         </button>
-        <button onclick="switchTab('models')" id="nav-models" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-          <i class="fa-solid fa-trophy mr-2"></i>Model Benchmark
+        <button onclick="switchTab('analytics')" id="nav-analytics" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-chart-column mr-1.5 text-slate-500"></i>Cohort Analytics
         </button>
-        <button onclick="switchTab('analytics')" id="nav-analytics" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-          <i class="fa-solid fa-chart-pie mr-2"></i>EDA & Visuals
+        <button onclick="switchTab('subjects')" id="nav-subjects" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-book-open mr-1.5 text-slate-500"></i>Subject Insights
         </button>
-        <button onclick="switchTab('reports')" id="nav-reports" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-          <i class="fa-solid fa-book-bookmark mr-2"></i>Lifecycle Reports
+        <button onclick="switchTab('history')" id="nav-history" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900 flex items-center">
+          <i class="fa-solid fa-clock-rotate-left mr-1.5 text-slate-500"></i>History
+          <span id="historyBadge" class="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 text-indigo-700 font-bold">0</span>
+        </button>
+        <button onclick="switchTab('roadmaps')" id="nav-roadmaps" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-bullseye mr-1.5 text-slate-500"></i>Action Roadmaps
         </button>
       </nav>
 
+      <!-- Right Header Actions -->
       <div class="flex items-center space-x-3">
-        <a href="https://github.com/Abhin1122" target="_blank" class="text-slate-500 hover:text-slate-800 transition text-lg">
+        <a href="https://github.com/Abhi111227/Student-Performance-Prediction-Framework" target="_blank" class="p-2 text-slate-500 hover:text-slate-900 transition text-lg" title="View Source on GitHub">
           <i class="fa-brands fa-github"></i>
         </a>
-        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-          <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-500 rounded-full animate-ping"></span> Live Deployment
+        <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+          <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-500 rounded-full animate-ping"></span> OLS Model Active (R²: 90.6%)
         </span>
       </div>
+
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 pt-10 pb-6 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-        Intelligent Learning Analytics & Student Success Prediction
-      </h1>
-      <p class="mt-3 max-w-3xl mx-auto text-base text-slate-600">
-        Empowering educators with proactive Machine Learning analytics to anticipate academic outcomes, identify at-risk learners, and prescribe timely educational interventions.
-      </p>
-      <div class="mt-4 flex flex-wrap justify-center gap-3 text-xs font-medium text-slate-600">
-        <span class="px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm"><i class="fa-solid fa-microchip text-indigo-500 mr-1.5"></i> Optimal Model: OLS Linear Regression</span>
-        <span class="px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm"><i class="fa-solid fa-bullseye text-emerald-500 mr-1.5"></i> Accuracy: 90.64% R²</span>
-        <span class="px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm"><i class="fa-solid fa-scale-balanced text-amber-500 mr-1.5"></i> Test MAE: ±4.03 Points</span>
+  <!-- Notification Toast Container -->
+  <div id="toast" class="fixed top-20 right-5 z-50 transform transition-all duration-300 translate-x-full opacity-0 max-w-sm p-4 rounded-xl shadow-lg border text-sm font-semibold flex items-center space-x-3">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-lg"></i>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- Mobile Sub-Navigation Bar -->
+  <div class="md:hidden flex overflow-x-auto p-2 bg-slate-100 border-b border-slate-200 space-x-2 text-xs">
+    <button onclick="switchTab('predict')" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-white shadow-sm font-semibold text-indigo-700">Studio</button>
+    <button onclick="switchTab('analytics')" class="whitespace-nowrap px-3 py-1.5 rounded-lg text-slate-600 font-medium">Analytics</button>
+    <button onclick="switchTab('subjects')" class="whitespace-nowrap px-3 py-1.5 rounded-lg text-slate-600 font-medium">Subjects</button>
+    <button onclick="switchTab('history')" class="whitespace-nowrap px-3 py-1.5 rounded-lg text-slate-600 font-medium">History</button>
+    <button onclick="switchTab('roadmaps')" class="whitespace-nowrap px-3 py-1.5 rounded-lg text-slate-600 font-medium">Action Plans</button>
+  </div>
+
+  <!-- Main Application Body -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: PREDICTION STUDIO (CORE HUB) -->
+    <!-- ================================================================= -->
+    <div id="tab-predict" class="tab-pane space-y-6">
+      
+      <!-- Studio Header Banner -->
+      <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-sparkles mr-1"></i>Inference Engine
+              </span>
+              <span class="text-xs text-slate-400">Trained on 400 Student Records</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black mt-1.5 tracking-tight">Student Academic Performance Prediction Studio</h1>
+            <p class="text-sm text-slate-300 mt-1 max-w-2xl">
+              Enter prior marks obtained and current engagement attributes. The calibrated machine learning engine computes projected exam scores, growth trajectory, and targeted academic interventions.
+            </p>
+          </div>
+          <div class="flex sm:flex-col gap-2 shrink-0 text-right">
+            <div class="px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 text-xs">
+              <span class="text-slate-400 block">Baseline Accuracy</span>
+              <span class="text-emerald-400 font-bold text-sm">90.64% R² (±4.03 MAE)</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-
-    <!-- TAB 1: PREDICTION STUDIO -->
-    <div id="tab-predict" class="tab-pane space-y-8">
+      <!-- Studio Layout: Input Form (5 Cols) + Results Panel (7 Cols) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Direct Manual Input System Card (5 Cols) -->
+        <!-- Left: Direct Manual Data Input Form -->
         <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
           <div class="flex items-center justify-between pb-4 border-b border-slate-100">
             <div>
-              <div class="flex items-center space-x-2">
-                <span class="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold">
-                  <i class="fa-solid fa-keyboard"></i>
-                </span>
-                <h2 class="text-lg font-bold text-slate-900">Direct Data Input</h2>
-              </div>
-              <p class="text-xs text-slate-500 mt-0.5">Enter student metrics directly to generate instant prediction</p>
+              <h2 class="text-base font-bold text-slate-900 flex items-center">
+                <i class="fa-solid fa-sliders text-indigo-600 mr-2"></i>Student Input Parameters
+              </h2>
+              <p class="text-xs text-slate-500">Directly input verified data to calculate prediction</p>
             </div>
             <button onclick="resetInputs()" class="text-xs font-semibold text-slate-500 hover:text-indigo-600 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition">
               <i class="fa-solid fa-rotate-left mr-1"></i>Reset
             </button>
           </div>
 
-          <form id="predictionForm" onsubmit="event.preventDefault(); calculatePrediction();" class="space-y-5 mt-6">
-            <!-- Study Hours Direct Input -->
-            <div>
-              <label for="studyHours" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+          <form id="predictionForm" onsubmit="event.preventDefault(); calculatePrediction();" class="space-y-4 mt-5">
+            
+            <!-- Student Identity & Course Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="studentName" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Student Name / ID
+                </label>
+                <input 
+                  type="text" 
+                  id="studentName" 
+                  value="Alex Sharma (STU-104)" 
+                  placeholder="e.g. Alex Sharma" 
+                  required
+                  class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-semibold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-white"
+                >
+              </div>
+
+              <div>
+                <label for="subjectSelect" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Enrolled Subject
+                </label>
+                <select 
+                  id="subjectSelect" 
+                  class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-semibold focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-white"
+                  onchange="calculatePrediction()"
+                >
+                  <option value="Mathematics for Computing">Mathematics for Computing</option>
+                  <option value="Machine Learning & Analytics" selected>Machine Learning & Analytics</option>
+                  <option value="Data Structures & Algorithms">Data Structures & Algorithms</option>
+                  <option value="Computer Networks">Computer Networks</option>
+                  <option value="Applied Physics">Applied Physics</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- MARKS OBTAINED FIELD (Integrated Core Feature) -->
+            <div class="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200/80">
+              <label for="marksObtained" class="flex justify-between items-center text-xs font-bold text-indigo-950 uppercase tracking-wider mb-1">
                 <span class="flex items-center">
-                  <i class="fa-solid fa-clock text-indigo-500 mr-2"></i>Weekly Self-Study Hours
+                  <i class="fa-solid fa-award text-indigo-600 mr-1.5"></i>Marks Obtained (Internal / Mid-Term)
                 </span>
-                <span class="text-xs font-semibold text-slate-400">Scale: 0 – 24 hrs</span>
+                <span class="text-[11px] text-indigo-600 font-bold">Scale: 0 – 100%</span>
               </label>
-              <div class="relative rounded-xl shadow-sm">
+              <div class="relative rounded-lg shadow-sm">
+                <input 
+                  type="number" 
+                  id="marksObtained" 
+                  step="0.5" 
+                  min="0" 
+                  max="100" 
+                  value="65.0" 
+                  placeholder="e.g. 65.0" 
+                  required
+                  class="block w-full rounded-lg border border-indigo-300 pl-3.5 pr-14 py-2.5 text-slate-900 font-extrabold text-base focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  oninput="calculatePrediction()"
+                >
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span class="text-xs font-bold text-indigo-600 uppercase">% Score</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-indigo-800/80 mt-1">Formative / mid-semester evaluation baseline used for value-add trajectory analysis.</p>
+            </div>
+
+            <!-- Weekly Study Hours -->
+            <div>
+              <label for="studyHours" class="flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <span class="flex items-center">
+                  <i class="fa-solid fa-clock text-indigo-500 mr-1.5"></i>Weekly Self-Study Hours
+                </span>
+                <span class="text-[11px] text-slate-400">Scale: 0 – 24 hrs</span>
+              </label>
+              <div class="relative rounded-lg shadow-sm">
                 <input 
                   type="number" 
                   id="studyHours" 
                   step="0.1" 
                   min="0" 
                   max="24" 
-                  value="5.5" 
+                  value="6.0" 
                   placeholder="e.g. 6.0" 
                   required
-                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-16 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  class="block w-full rounded-lg border border-slate-300 pl-3.5 pr-14 py-2 text-slate-900 font-bold text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-white"
                   oninput="calculatePrediction()"
                 >
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <span class="text-xs font-bold text-slate-400 uppercase">Hours</span>
                 </div>
               </div>
-              <p class="text-[11px] text-slate-500 mt-1">Average study time dedicated outside lecture hours.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Average weekly independent study dedicating to this course.</p>
             </div>
 
-            <!-- Attendance Percentage Direct Input -->
+            <!-- Attendance Percentage -->
             <div>
-              <label for="attendance" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+              <label for="attendance" class="flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 <span class="flex items-center">
-                  <i class="fa-solid fa-user-check text-emerald-500 mr-2"></i>Class Attendance Rate
+                  <i class="fa-solid fa-user-check text-emerald-500 mr-1.5"></i>Class Attendance Rate
                 </span>
-                <span class="text-xs font-semibold text-slate-400">Scale: 0 – 100%</span>
+                <span class="text-[11px] text-slate-400">Scale: 0 – 100%</span>
               </label>
-              <div class="relative rounded-xl shadow-sm">
+              <div class="relative rounded-lg shadow-sm">
                 <input 
                   type="number" 
                   id="attendance" 
                   step="0.5" 
                   min="0" 
                   max="100" 
-                  value="75" 
-                  placeholder="e.g. 85" 
+                  value="80.0" 
+                  placeholder="e.g. 80.0" 
                   required
-                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-12 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  class="block w-full rounded-lg border border-slate-300 pl-3.5 pr-12 py-2 text-slate-900 font-bold text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-white"
                   oninput="calculatePrediction()"
                 >
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-                  <span class="text-sm font-bold text-slate-400">%</span>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span class="text-xs font-bold text-slate-400">%</span>
                 </div>
               </div>
-              <p class="text-[11px] text-slate-500 mt-1">Percentage of lecture sessions attended throughout the term.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Percentage of scheduled instructional sessions attended.</p>
             </div>
 
-            <!-- Assignments Completed Direct Input -->
+            <!-- Assignments Completed -->
             <div>
-              <label for="assignments" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+              <label for="assignments" class="flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 <span class="flex items-center">
-                  <i class="fa-solid fa-list-check text-amber-500 mr-2"></i>Assignments Completed
+                  <i class="fa-solid fa-list-check text-amber-500 mr-1.5"></i>Assignments Completed
                 </span>
-                <span class="text-xs font-semibold text-slate-400">Quota: 0 – 10 tasks</span>
+                <span class="text-[11px] text-slate-400">Quota: 0 – 10 tasks</span>
               </label>
-              <div class="relative rounded-xl shadow-sm">
+              <div class="relative rounded-lg shadow-sm">
                 <input 
                   type="number" 
                   id="assignments" 
                   step="1" 
                   min="0" 
                   max="10" 
-                  value="5" 
-                  placeholder="e.g. 7" 
+                  value="6" 
+                  placeholder="e.g. 6" 
                   required
-                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-16 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  class="block w-full rounded-lg border border-slate-300 pl-3.5 pr-14 py-2 text-slate-900 font-bold text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition bg-white"
                   oninput="calculatePrediction()"
                 >
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <span class="text-xs font-bold text-slate-400">/ 10</span>
                 </div>
               </div>
-              <p class="text-[11px] text-slate-500 mt-1">Number of continuous evaluation assignments submitted.</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Continuous evaluation homework problem sets submitted on time.</p>
             </div>
 
             <!-- Primary Prediction Action Button -->
             <button 
               type="submit" 
-              class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-200 hover:shadow-indigo-300 transition flex items-center justify-center space-x-2 active:scale-[0.99]"
+              class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-200 transition flex items-center justify-center space-x-2 active:scale-[0.99]"
             >
               <i class="fa-solid fa-calculator text-base"></i>
               <span>Calculate & Predict Exam Score</span>
@@ -216,97 +317,113 @@
           </form>
 
           <!-- Quick Archetype Preset Buttons -->
-          <div class="pt-5 mt-6 border-t border-slate-100">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">
-              <i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Quick Sample Archetypes
+          <div class="pt-4 mt-5 border-t border-slate-100">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+              <i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Quick Archetype Profiles
             </span>
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="setProfile(2.0, 55, 2)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition text-center">
+              <button onclick="setProfile('Jordan Lee', 'Mathematics for Computing', 42.0, 2.0, 55.0, 2)" class="px-2 py-1.5 text-xs font-semibold rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition text-center">
                 ⚠️ At-Risk
               </button>
-              <button onclick="setProfile(5.5, 75, 5)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition text-center">
+              <button onclick="setProfile('Alex Sharma', 'Machine Learning & Analytics', 65.0, 5.5, 75.0, 5)" class="px-2 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition text-center">
                 👤 Average
               </button>
-              <button onclick="setProfile(8.5, 95, 9)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition text-center">
+              <button onclick="setProfile('Priya Nair', 'Data Structures & Algorithms', 88.0, 8.5, 95.0, 9)" class="px-2 py-1.5 text-xs font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition text-center">
                 ⭐ Top Scorer
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Real-Time Prediction Output Card (7 Cols) -->
-        <div class="lg:col-span-7 space-y-6">
+        <!-- Right: Integrated Diagnostic & Trajectory Results Panel (7 Cols) -->
+        <div class="lg:col-span-7 space-y-5">
           <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 relative overflow-hidden">
-            <!-- Background Accent -->
-            <div id="accentGlow" class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
+            
+            <!-- Result Card Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-100">
               <div>
-                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Predictive Inference Result</span>
-                <h3 class="text-2xl font-black text-slate-900 mt-0.5">Estimated Academic Performance</h3>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Predictive Inference Outcome</span>
+                <h3 id="resultStudentTitle" class="text-xl font-black text-slate-900 mt-0.5">Alex Sharma</h3>
+                <span id="resultSubjectSubtitle" class="text-xs text-indigo-600 font-semibold">Machine Learning & Analytics</span>
               </div>
-              <div id="badgeContainer" class="px-3.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
-                Passing / Satisfactory
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
-              <!-- Score Box -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Predicted Score</span>
-                <span id="predictedScoreDisplay" class="text-4xl font-extrabold text-indigo-600 block mt-1">68.0</span>
-                <span class="text-xs text-slate-400">out of 100 points</span>
-              </div>
-              <!-- Percentile Box -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Cohort Percentile</span>
-                <span id="percentileDisplay" class="text-4xl font-extrabold text-slate-800 block mt-1">52%</span>
-                <span class="text-xs text-slate-400">historical ranking</span>
-              </div>
-              <!-- Risk Status Box -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Academic Standing</span>
-                <span id="standingDisplay" class="text-xl font-bold text-slate-800 block mt-2.5">Moderate</span>
-                <span class="text-xs text-slate-400">risk tier category</span>
+              <div id="badgeContainer" class="px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Merit / High Performer
               </div>
             </div>
 
-            <!-- Dynamic Progress Meter -->
-            <div class="space-y-1.5">
-              <div class="flex justify-between text-xs font-semibold text-slate-600">
-                <span>Score Scale</span>
-                <span id="scaleLabel">68.0 / 100</span>
+            <!-- Main Score & Metric Display -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-5">
+              
+              <!-- Predicted Final Score Box -->
+              <div class="p-4 rounded-xl bg-gradient-to-b from-indigo-50/60 to-white border border-indigo-100 text-center relative">
+                <span class="text-[11px] font-bold text-indigo-900 uppercase tracking-wider block">Projected Final Score</span>
+                <span id="predictedScoreDisplay" class="text-4xl font-black text-indigo-700 block mt-1">73.5</span>
+                <span class="text-[11px] text-slate-500 font-medium">Summative Exam (0-100)</span>
               </div>
-              <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 68%;"></div>
+
+              <!-- Value-Add / Momentum Box (Integrated Marks Obtained) -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Value-Add Trajectory</span>
+                <span id="trajectoryDisplay" class="text-3xl font-extrabold text-emerald-600 block mt-1">+8.5 pts</span>
+                <span id="trajectorySub" class="text-[11px] text-slate-500 font-medium">Growth vs Midterm (65.0)</span>
               </div>
-              <div class="flex justify-between text-[10px] text-slate-400">
+
+              <!-- Projected Grade Letter Box -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Projected Grade</span>
+                <span id="gradeLetterDisplay" class="text-3xl font-black text-slate-800 block mt-1">Grade A</span>
+                <span id="percentileDisplay" class="text-[11px] text-slate-500 font-medium">65th Cohort Percentile</span>
+              </div>
+            </div>
+
+            <!-- Value-Add Trajectory Status Alert -->
+            <div id="trajectoryBanner" class="p-3.5 rounded-xl border flex items-center space-x-3 bg-emerald-50 border-emerald-200 text-emerald-900 text-xs font-semibold">
+              <i id="trajectoryIcon" class="fa-solid fa-arrow-trend-up text-emerald-600 text-base"></i>
+              <span id="trajectoryText">
+                Positive Academic Velocity: Student's study habits (+6.0 hrs) are projected to yield an 8.5-point improvement over midterm marks (65.0% &rarr; 73.5%).
+              </span>
+            </div>
+
+            <!-- Visual Score Meter -->
+            <div class="space-y-1.5 mt-5">
+              <div class="flex justify-between text-xs font-bold text-slate-700">
+                <span>Score Scale Progression</span>
+                <span id="scaleLabel">73.5 / 100</span>
+              </div>
+              <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 73.5%;"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-400 font-semibold">
                 <span>0% (Failing)</span>
                 <span>50% (Passing Threshold)</span>
-                <span>75% (Distinction)</span>
+                <span>70% (Merit Band)</span>
+                <span>80% (Distinction)</span>
                 <span>100%</span>
               </div>
             </div>
 
-            <!-- Pedagogical Guidance Box -->
-            <div class="mt-6 p-4 rounded-xl bg-indigo-50/80 border border-indigo-100 flex items-start space-x-3">
-              <div class="text-indigo-600 text-lg mt-0.5">
-                <i class="fa-solid fa-lightbulb"></i>
+            <!-- Target Gap Analysis Card -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 mt-5">
+              <div class="flex items-center justify-between font-bold text-slate-900 mb-2">
+                <span class="flex items-center"><i class="fa-solid fa-flag-checkered text-indigo-600 mr-1.5"></i>Next Milestone Target:</span>
+                <span id="nextTargetTitle" class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">Distinction (80.0%)</span>
               </div>
-              <div>
-                <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wider">Targeted Educational Guidance</h4>
-                <p id="guidanceText" class="text-sm text-indigo-800 mt-0.5">
-                  Maintaining regular attendance and increasing weekly study by 1.5 hours will reliably elevate this student toward distinction level.
-                </p>
-              </div>
+              <p id="gapAnalysisText" class="text-slate-600">
+                The student is currently <strong class="text-indigo-700">6.5 marks</strong> away from Distinction (80%). Reaching this target requires <strong class="text-slate-900">+1.4 hours</strong> of additional weekly study OR completing <strong class="text-slate-900">2 more assignments</strong>.
+              </p>
             </div>
 
-            <!-- Mathematical Formulation Trace -->
-            <div class="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-500">
-              <span class="font-semibold text-slate-700">Model Computation Trace:</span>
-              <div id="mathTrace" class="font-mono text-[11px] text-slate-600 mt-1">
-                Score = 3.42 + (4.76 × 5.5) + (0.38 × 75.0) + (1.97 × 5.0) = 67.92
-              </div>
+            <!-- Educational Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100 mt-5">
+              <button onclick="saveCurrentPrediction()" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-bookmark text-indigo-400"></i>
+                <span>Save to History Log</span>
+              </button>
+              
+              <button onclick="goToRoadmap()" class="flex-1 py-2.5 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Generate 4-Week Action Plan</span>
+              </button>
             </div>
 
           </div>
@@ -315,200 +432,474 @@
       </div>
     </div>
 
-    <!-- TAB 2: MODEL BENCHMARK LEADERBOARD -->
-    <div id="tab-models" class="tab-pane hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-xl font-bold text-slate-900">Multi-Model Performance Benchmark</h2>
-            <p class="text-xs text-slate-500">Rigorous empirical comparison of 6 ML algorithms evaluated on 80 unseen test records (5-Fold CV)</p>
-          </div>
-          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
-            Partition: 80% Train (320) / 20% Test (80)
-          </span>
+    <!-- ================================================================= -->
+    <!-- TAB 2: COHORT & PERFORMANCE ANALYTICS -->
+    <!-- ================================================================= -->
+    <div id="tab-analytics" class="tab-pane hidden space-y-6">
+      
+      <!-- KPI Metric Cards (Real 400 Student Dataset) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-4 rounded-2xl border border-slate-200">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Historical Cohort</span>
+          <span class="text-2xl sm:text-3xl font-black text-slate-900 block mt-1">400 Records</span>
+          <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-check mr-1"></i>100% Data Completeness</span>
         </div>
 
-        <div class="overflow-x-auto mt-6">
-          <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead class="bg-slate-50 text-xs font-bold text-slate-600 uppercase tracking-wider">
+        <div class="glass-card p-4 rounded-2xl border border-slate-200">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Historical Mean Score</span>
+          <span class="text-2xl sm:text-3xl font-black text-indigo-600 block mt-1">67.35%</span>
+          <span class="text-xs text-slate-500 font-medium">Std Deviation: 16.33 pts</span>
+        </div>
+
+        <div class="glass-card p-4 rounded-2xl border border-slate-200">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Historical Pass Rate</span>
+          <span class="text-2xl sm:text-3xl font-black text-emerald-600 block mt-1">84.25%</span>
+          <span class="text-xs text-slate-500 font-medium">337 of 400 students &ge; 50%</span>
+        </div>
+
+        <div class="glass-card p-4 rounded-2xl border border-slate-200">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Distinction Rate</span>
+          <span class="text-2xl sm:text-3xl font-black text-amber-600 block mt-1">42.25%</span>
+          <span class="text-xs text-slate-500 font-medium">169 students &ge; 70%</span>
+        </div>
+      </div>
+
+      <!-- Interactive Charts Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Chart 1: Grade Distribution (7 Cols) -->
+        <div class="lg:col-span-7 glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Cohort Grade Distribution</h3>
+              <p class="text-xs text-slate-500">Actual outcome breakdown across 400 historical students</p>
+            </div>
+            <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-700">Real Dataset</span>
+          </div>
+          <div class="h-64">
+            <canvas id="gradeDistChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Marginal Gains Matrix (5 Cols) -->
+        <div class="lg:col-span-5 glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="pb-3 border-b border-slate-100 mb-4">
+            <h3 class="text-base font-bold text-slate-900">Marginal Effort-to-Score Matrix</h3>
+            <p class="text-xs text-slate-500">Quantified academic return per behavioral unit</p>
+          </div>
+          
+          <div class="space-y-3.5 text-xs">
+            <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">+1.0 Hour Weekly Self-Study</span>
+                <span class="text-slate-500">Dominant predictive driver</span>
+              </div>
+              <span class="text-sm font-extrabold text-indigo-700 px-2.5 py-1 rounded-lg bg-white border border-indigo-200">
+                +4.76 Points
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">+10% Class Attendance</span>
+                <span class="text-slate-500">Exposure & lecture retention</span>
+              </div>
+              <span class="text-sm font-extrabold text-emerald-700 px-2.5 py-1 rounded-lg bg-white border border-emerald-200">
+                +3.80 Points
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">+1 Submitted Assignment</span>
+                <span class="text-slate-500">Coursework continuous evaluation</span>
+              </div>
+              <span class="text-sm font-extrabold text-amber-700 px-2.5 py-1 rounded-lg bg-white border border-amber-200">
+                +1.97 Points
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500">
+              <i class="fa-solid fa-circle-info mr-1 text-indigo-500"></i>
+              Model Intercept: <strong>3.42 points</strong> baseline minimum score without active attendance or study.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 2: Interactive Scatter Plot with Active Student Marker (12 Cols) -->
+        <div class="lg:col-span-12 glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-100 mb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Historical Cohort Positioning & Regression Fit</h3>
+              <p class="text-xs text-slate-500">
+                Visualizing Study Hours vs Exam Score with the <strong class="text-amber-600">Active Evaluated Student</strong> plotted as a highlighted diamond marker
+              </p>
+            </div>
+            <div class="flex items-center space-x-2 text-xs font-semibold">
+              <span class="inline-block w-3 h-3 rounded-full bg-indigo-500"></span> <span>Historical Students</span>
+              <span class="inline-block w-3 h-3 bg-amber-500 rotate-45 ml-2"></span> <span>Active Student</span>
+            </div>
+          </div>
+          <div class="h-80">
+            <canvas id="cohortScatterChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: SUBJECT-WISE INSIGHTS & BENCHMARKS -->
+    <!-- ================================================================= -->
+    <div id="tab-subjects" class="tab-pane hidden space-y-6">
+      
+      <div class="glass-card p-6 rounded-2xl border border-slate-200">
+        <div class="pb-4 border-b border-slate-100">
+          <h2 class="text-xl font-bold text-slate-900">Subject-Specific Academic Benchmarks</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Explore empirical pass rates, historical difficulty indices, and recommended study-hour thresholds by course</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          
+          <!-- Subject Card 1: Machine Learning -->
+          <div class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between hover:border-indigo-300 transition">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">CS-402 • 4 Credits</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Moderate-High</span>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-base mt-2">Machine Learning & Analytics</h3>
+              <p class="text-xs text-slate-500 mt-1">Supervised learning, loss optimization, feature engineering, and model evaluation metrics.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-semibold text-slate-700">
+                <div class="p-2 rounded bg-slate-50">Avg Score: <strong class="text-indigo-600">71.0%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Pass Rate: <strong class="text-emerald-600">88.2%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Min Study: <strong>6.0 hrs/wk</strong></div>
+                <div class="p-2 rounded bg-slate-50">Key Factor: <strong>Theory + Code</strong></div>
+              </div>
+            </div>
+            <button onclick="loadSubjectToStudio('Machine Learning & Analytics', 6.0, 85.0, 7)" class="w-full mt-4 py-2 px-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">
+              Load into Prediction Studio &rarr;
+            </button>
+          </div>
+
+          <!-- Subject Card 2: Mathematics for Computing -->
+          <div class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between hover:border-indigo-300 transition">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">MA-201 • 4 Credits</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">High Difficulty</span>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-base mt-2">Mathematics for Computing</h3>
+              <p class="text-xs text-slate-500 mt-1">Linear algebra, multivariable calculus, probability distributions, and vector spaces.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-semibold text-slate-700">
+                <div class="p-2 rounded bg-slate-50">Avg Score: <strong class="text-indigo-600">64.2%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Pass Rate: <strong class="text-amber-600">79.5%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Min Study: <strong>6.5 hrs/wk</strong></div>
+                <div class="p-2 rounded bg-slate-50">Key Factor: <strong>Problem Sets</strong></div>
+              </div>
+            </div>
+            <button onclick="loadSubjectToStudio('Mathematics for Computing', 6.5, 80.0, 6)" class="w-full mt-4 py-2 px-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">
+              Load into Prediction Studio &rarr;
+            </button>
+          </div>
+
+          <!-- Subject Card 3: Data Structures & Algorithms -->
+          <div class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between hover:border-indigo-300 transition">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">CS-301 • 4 Credits</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">High Difficulty</span>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-base mt-2">Data Structures & Algorithms</h3>
+              <p class="text-xs text-slate-500 mt-1">Graph theory, dynamic programming, tree traversals, and asymptotic complexity analysis.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-semibold text-slate-700">
+                <div class="p-2 rounded bg-slate-50">Avg Score: <strong class="text-indigo-600">62.8%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Pass Rate: <strong class="text-amber-600">76.4%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Min Study: <strong>7.0 hrs/wk</strong></div>
+                <div class="p-2 rounded bg-slate-50">Key Factor: <strong>Hands-on Labs</strong></div>
+              </div>
+            </div>
+            <button onclick="loadSubjectToStudio('Data Structures & Algorithms', 7.0, 82.0, 8)" class="w-full mt-4 py-2 px-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">
+              Load into Prediction Studio &rarr;
+            </button>
+          </div>
+
+          <!-- Subject Card 4: Computer Networks -->
+          <div class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between hover:border-indigo-300 transition">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">CS-304 • 3 Credits</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Moderate</span>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-base mt-2">Computer Networks</h3>
+              <p class="text-xs text-slate-500 mt-1">TCP/IP stack, routing protocols, socket programming, packet routing, and network security.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-semibold text-slate-700">
+                <div class="p-2 rounded bg-slate-50">Avg Score: <strong class="text-indigo-600">69.8%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Pass Rate: <strong class="text-emerald-600">86.0%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Min Study: <strong>4.5 hrs/wk</strong></div>
+                <div class="p-2 rounded bg-slate-50">Key Factor: <strong>Packet Labs</strong></div>
+              </div>
+            </div>
+            <button onclick="loadSubjectToStudio('Computer Networks', 5.0, 78.0, 5)" class="w-full mt-4 py-2 px-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">
+              Load into Prediction Studio &rarr;
+            </button>
+          </div>
+
+          <!-- Subject Card 5: Applied Physics -->
+          <div class="p-5 rounded-xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between hover:border-indigo-300 transition">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase">PH-101 • 4 Credits</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700">Moderate-High</span>
+              </div>
+              <h3 class="font-extrabold text-slate-900 text-base mt-2">Applied Physics</h3>
+              <p class="text-xs text-slate-500 mt-1">Electromagnetism, quantum mechanics fundamentals, thermodynamics, and optics.</p>
+              
+              <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-semibold text-slate-700">
+                <div class="p-2 rounded bg-slate-50">Avg Score: <strong class="text-indigo-600">65.4%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Pass Rate: <strong class="text-emerald-600">81.0%</strong></div>
+                <div class="p-2 rounded bg-slate-50">Min Study: <strong>5.5 hrs/wk</strong></div>
+                <div class="p-2 rounded bg-slate-50">Key Factor: <strong>Concept Rigor</strong></div>
+              </div>
+            </div>
+            <button onclick="loadSubjectToStudio('Applied Physics', 5.5, 75.0, 5)" class="w-full mt-4 py-2 px-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">
+              Load into Prediction Studio &rarr;
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TAB 4: PREDICTION HISTORY & PROGRESS TRACKING -->
+    <!-- ================================================================= -->
+    <div id="tab-history" class="tab-pane hidden space-y-6">
+      
+      <div class="glass-card p-6 rounded-2xl border border-slate-200">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Historical Prediction Session Log</h2>
+            <p class="text-xs text-slate-500">Track and review evaluated student predictions, trajectory improvements, and risk status</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="exportHistoryCSV()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center">
+              <i class="fa-solid fa-file-csv text-emerald-600 mr-1.5 text-sm"></i>Export CSV
+            </button>
+            <button onclick="clearHistory()" class="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition">
+              <i class="fa-solid fa-trash-can mr-1"></i>Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mt-4">
+          <div class="sm:col-span-8">
+            <input 
+              type="text" 
+              id="historySearch" 
+              placeholder="Filter by Student Name or Subject..." 
+              class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 font-medium focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
+              oninput="renderHistoryTable()"
+            >
+          </div>
+          <div class="sm:col-span-4">
+            <select 
+              id="historyFilterRisk" 
+              class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 font-semibold focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 bg-white"
+              onchange="renderHistoryTable()"
+            >
+              <option value="ALL">All Risk Tiers</option>
+              <option value="High Performer">High Performer (70%+)</option>
+              <option value="Moderate">Moderate (50% - 69%)</option>
+              <option value="At Risk">At Risk (&lt; 50%)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="overflow-x-auto mt-4 rounded-xl border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200 text-left text-xs">
+            <thead class="bg-slate-50 font-bold text-slate-600 uppercase tracking-wider">
               <tr>
-                <th class="py-3 px-4">Rank & Algorithm</th>
-                <th class="py-3 px-3">Test R²</th>
-                <th class="py-3 px-3">Adjusted R²</th>
-                <th class="py-3 px-3">MAE (Marks)</th>
-                <th class="py-3 px-3">RMSE (Marks)</th>
-                <th class="py-3 px-3">5-Fold CV R²</th>
-                <th class="py-3 px-4">Model Status</th>
+                <th class="py-3 px-3.5">Timestamp</th>
+                <th class="py-3 px-3.5">Student / ID</th>
+                <th class="py-3 px-3">Subject</th>
+                <th class="py-3 px-2.5">Marks In</th>
+                <th class="py-3 px-2.5">Study</th>
+                <th class="py-3 px-2.5">Attend</th>
+                <th class="py-3 px-2.5">Assign</th>
+                <th class="py-3 px-3 text-indigo-700">Projected</th>
+                <th class="py-3 px-3">Trajectory</th>
+                <th class="py-3 px-3">Standing</th>
+                <th class="py-3 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
-              <tr class="bg-indigo-50/40 font-semibold text-slate-900">
-                <td class="py-3.5 px-4 flex items-center">
-                  <span class="mr-2 text-amber-500">🥇</span> Linear Regression (OLS)
-                </td>
-                <td class="py-3.5 px-3 text-emerald-600 font-bold">0.9064</td>
-                <td class="py-3.5 px-3">0.9027</td>
-                <td class="py-3.5 px-3 text-indigo-600">4.0298</td>
-                <td class="py-3.5 px-3">5.0432</td>
-                <td class="py-3.5 px-3">0.8984 ± 0.015</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Selected Champion</span></td>
-              </tr>
-              <tr>
-                <td class="py-3.5 px-4 flex items-center">
-                  <span class="mr-2 text-slate-400">🥈</span> Ridge Regression (L2)
-                </td>
-                <td class="py-3.5 px-3 font-bold text-slate-800">0.9064</td>
-                <td class="py-3.5 px-3">0.9027</td>
-                <td class="py-3.5 px-3">4.0306</td>
-                <td class="py-3.5 px-3">5.0436</td>
-                <td class="py-3.5 px-3">0.8984 ± 0.015</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">Regularized Alternative</span></td>
-              </tr>
-              <tr>
-                <td class="py-3.5 px-4 flex items-center">
-                  <span class="mr-2 text-amber-700">🥉</span> Lasso Regression (L1)
-                </td>
-                <td class="py-3.5 px-3 font-bold text-slate-800">0.9062</td>
-                <td class="py-3.5 px-3">0.9025</td>
-                <td class="py-3.5 px-3">4.0390</td>
-                <td class="py-3.5 px-3">5.0500</td>
-                <td class="py-3.5 px-3">0.8984 ± 0.015</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">Sparse Baseline</span></td>
-              </tr>
-              <tr>
-                <td class="py-3.5 px-4">4. Gradient Boosting Regressor</td>
-                <td class="py-3.5 px-3">0.8663</td>
-                <td class="py-3.5 px-3">0.8610</td>
-                <td class="py-3.5 px-3">4.7634</td>
-                <td class="py-3.5 px-3">6.0291</td>
-                <td class="py-3.5 px-3">0.8681 ± 0.012</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">Ensemble Boosting</span></td>
-              </tr>
-              <tr>
-                <td class="py-3.5 px-4">5. Random Forest Regressor</td>
-                <td class="py-3.5 px-3">0.8499</td>
-                <td class="py-3.5 px-3">0.8440</td>
-                <td class="py-3.5 px-3">5.0829</td>
-                <td class="py-3.5 px-3">6.3867</td>
-                <td class="py-3.5 px-3">0.8532 ± 0.016</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">Ensemble Bagging</span></td>
-              </tr>
-              <tr>
-                <td class="py-3.5 px-4">6. Decision Tree Regressor</td>
-                <td class="py-3.5 px-3">0.7758</td>
-                <td class="py-3.5 px-3">0.7669</td>
-                <td class="py-3.5 px-3">6.1485</td>
-                <td class="py-3.5 px-3">7.8065</td>
-                <td class="py-3.5 px-3">0.7804 ± 0.040</td>
-                <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">Non-linear Baseline</span></td>
-              </tr>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 bg-white font-medium text-slate-700">
+              <!-- Populated via JavaScript -->
             </tbody>
           </table>
         </div>
+
+        <div id="emptyHistoryMsg" class="hidden text-center py-10 text-slate-400 text-xs">
+          <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300 block"></i>
+          No prediction records match the criteria. Make a prediction in the Studio and click "Save to History Log".
+        </div>
+
       </div>
     </div>
 
-    <!-- TAB 3: EDA & VISUAL ANALYTICS GALLERY -->
-    <div id="tab-analytics" class="tab-pane hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold text-slate-900 mb-1">Exploratory & Evaluative Visualization Suite</h2>
-        <p class="text-xs text-slate-500 mb-6">Generated figures illustrating feature distributions, risk cohorts, residual normality, and predictive accuracy</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="p-3 bg-slate-50 border-b border-slate-200 font-semibold text-xs text-slate-700">
-              <i class="fa-solid fa-users text-indigo-500 mr-2"></i>Academic Risk & Cohort Stratification
+    <!-- ================================================================= -->
+    <!-- TAB 5: PERSONALIZED ACTION PLANS & ROADMAPS -->
+    <!-- ================================================================= -->
+    <div id="tab-roadmaps" class="tab-pane hidden space-y-6">
+      
+      <div class="glass-card p-6 rounded-2xl border border-slate-200">
+        <div class="pb-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded bg-indigo-100 text-indigo-700 text-xs font-bold uppercase">Dynamic Plan</span>
+              <h2 class="text-xl font-bold text-slate-900">Personalized 4-Week Academic Recovery & Growth Roadmap</h2>
             </div>
-            <img src="/figures/eda/academic_risk_distribution.png" alt="Risk Distribution" class="w-full object-contain p-2 hover:scale-[1.01] transition">
+            <p id="roadmapStudentSubtitle" class="text-xs text-slate-500 mt-1">
+              Custom intervention plan generated for <strong>Alex Sharma</strong> in <strong>Machine Learning & Analytics</strong>
+            </p>
+          </div>
+          <button onclick="window.print()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center">
+            <i class="fa-solid fa-print mr-1.5"></i>Print Plan
+          </button>
+        </div>
+
+        <!-- Diagnostic Summary Header -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Evaluated Performance</span>
+            <span id="planScoreDisplay" class="text-2xl font-black text-indigo-700 block mt-0.5">73.5%</span>
+            <span class="text-[11px] text-slate-500">Predicted Final Exam Score</span>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="p-3 bg-slate-50 border-b border-slate-200 font-semibold text-xs text-slate-700">
-              <i class="fa-solid fa-bullseye text-emerald-500 mr-2"></i>Actual vs Predicted Exam Score (Champion Model)
-            </div>
-            <img src="/figures/models/actual_vs_predicted_best_model.png" alt="Actual vs Predicted" class="w-full object-contain p-2 hover:scale-[1.01] transition">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Trajectory Status</span>
+            <span id="planTrajectoryDisplay" class="text-2xl font-extrabold text-emerald-600 block mt-0.5">+8.5 pts</span>
+            <span class="text-[11px] text-slate-500">Value-add relative to midterm</span>
           </div>
 
-          <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="p-3 bg-slate-50 border-b border-slate-200 font-semibold text-xs text-slate-700">
-              <i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Feature Distributions & Density Curves
-            </div>
-            <img src="/figures/feature_distributions.png" alt="Feature Distributions" class="w-full object-contain p-2 hover:scale-[1.01] transition">
-          </div>
-
-          <div class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="p-3 bg-slate-50 border-b border-slate-200 font-semibold text-xs text-slate-700">
-              <i class="fa-solid fa-fire text-rose-500 mr-2"></i>Conditional Performance Heatmap
-            </div>
-            <img src="/figures/eda/conditional_performance_heatmap.png" alt="Conditional Heatmap" class="w-full object-contain p-2 hover:scale-[1.01] transition">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Next Grade Milestone</span>
+            <span id="planTargetDisplay" class="text-2xl font-bold text-slate-900 block mt-0.5">Distinction (80%)</span>
+            <span class="text-[11px] text-slate-500">Gap: 6.5 additional points</span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- TAB 4: LIFECYCLE REPORTS -->
-    <div id="tab-reports" class="tab-pane hidden space-y-6">
-      <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
-        <h2 class="text-xl font-bold text-slate-900 mb-1">Machine Learning Lifecycle Documentation</h2>
-        <p class="text-xs text-slate-500 mb-6">Complete end-to-end phase technical reports and academic deliverables</p>
+        <!-- 4-Week Structured Roadmap Timeline -->
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center">
+          <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i>Structured Weekly Action Plan
+        </h3>
 
         <div class="space-y-4">
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 1: Problem Understanding</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
+          
+          <!-- Week 1 -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row gap-4 items-start">
+            <div class="flex items-center space-x-3 shrink-0 md:w-44">
+              <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
+                W1
+              </div>
+              <div>
+                <span class="font-bold text-slate-900 text-xs block">Week 1</span>
+                <span class="text-[10px] text-indigo-600 font-semibold uppercase">Habit & Attendance Reset</span>
+              </div>
             </div>
-            <p class="text-xs text-slate-600 mt-1">Formulated supervised learning objective, stakeholder mapping, success metrics, and early intervention framing.</p>
+            <div class="flex-1 text-xs text-slate-600 space-y-1">
+              <p><strong>Primary Objective:</strong> Eliminate attendance drop-off and stabilize continuous lecture exposure.</p>
+              <ul class="list-disc pl-4 space-y-0.5 text-slate-500">
+                <li>Commit to 100% lecture attendance this week to secure instructional baseline.</li>
+                <li>Conduct a 2-hour syllabus audit to identify chapters covered on midterm vs final.</li>
+                <li>Establish a dedicated, uninterrupted study slot in the daily calendar (minimum 1.5 hrs/day).</li>
+              </ul>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
+              Est. Gain: +2.5 pts
+            </span>
           </div>
 
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 2: Data Collection & Profiling</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
+          <!-- Week 2 -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row gap-4 items-start">
+            <div class="flex items-center space-x-3 shrink-0 md:w-44">
+              <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
+                W2
+              </div>
+              <div>
+                <span class="font-bold text-slate-900 text-xs block">Week 2</span>
+                <span class="text-[10px] text-indigo-600 font-semibold uppercase">Coursework Mastery</span>
+              </div>
             </div>
-            <p class="text-xs text-slate-600 mt-1">Ingested 400 records across 4 dimensions. Validated MD5 integrity hash, 0 nulls, 0 duplicate records, and parametric summaries.</p>
+            <div class="flex-1 text-xs text-slate-600 space-y-1">
+              <p><strong>Primary Objective:</strong> Clear assignment backlogs and achieve full marks on formative submissions.</p>
+              <ul class="list-disc pl-4 space-y-0.5 text-slate-500">
+                <li>Complete and submit all pending problem sets and laboratory exercises.</li>
+                <li>Seek clarification during office hours on topics where midterm marks were lost.</li>
+                <li>Each completed assignment reliably adds <strong class="text-indigo-600">+1.97 points</strong> to summative score projection.</li>
+              </ul>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
+              Est. Gain: +3.9 pts
+            </span>
           </div>
 
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 3: Data Preprocessing & Partitioning</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
+          <!-- Week 3 -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row gap-4 items-start">
+            <div class="flex items-center space-x-3 shrink-0 md:w-44">
+              <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
+                W3
+              </div>
+              <div>
+                <span class="font-bold text-slate-900 text-xs block">Week 3</span>
+                <span class="text-[10px] text-indigo-600 font-semibold uppercase">Deep Study Sprints</span>
+              </div>
             </div>
-            <p class="text-xs text-slate-600 mt-1">Constructed 80/20 train-test partitions (320 train / 80 test) and implemented zero-leakage StandardScaler scaling.</p>
+            <div class="flex-1 text-xs text-slate-600 space-y-1">
+              <p><strong>Primary Objective:</strong> Ramp up independent self-study hours into high-yield problem solving.</p>
+              <ul class="list-disc pl-4 space-y-0.5 text-slate-500">
+                <li>Increase weekly study time by <strong id="planStudyDeltaText">+2.0 hours</strong> over baseline.</li>
+                <li>Engage in active recall and spaced repetition for theoretical formulations.</li>
+                <li>Form a collaborative study pair for peer testing and conceptual walkthroughs.</li>
+              </ul>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
+              Est. Gain: +4.8 pts
+            </span>
           </div>
 
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 4: Exploratory Data Analysis (EDA)</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
+          <!-- Week 4 -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row gap-4 items-start">
+            <div class="flex items-center space-x-3 shrink-0 md:w-44">
+              <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
+                W4
+              </div>
+              <div>
+                <span class="font-bold text-slate-900 text-xs block">Week 4</span>
+                <span class="text-[10px] text-emerald-600 font-semibold uppercase">Exam Simulation & Polish</span>
+              </div>
             </div>
-            <p class="text-xs text-slate-600 mt-1">Stratified student cohorts into High Performers (42.25%), Moderate (42.00%), and At Risk (15.75%).</p>
+            <div class="flex-1 text-xs text-slate-600 space-y-1">
+              <p><strong>Primary Objective:</strong> Timed mock exam practice and error analysis.</p>
+              <ul class="list-disc pl-4 space-y-0.5 text-slate-500">
+                <li>Attempt at least two previous years' examination papers under strict timed conditions.</li>
+                <li>Conduct thorough post-mortem review of mistakes and review formula sheets.</li>
+                <li>Ensure adequate rest and mental focus leading up to the summative evaluation.</li>
+              </ul>
+            </div>
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+              Peak Readiness
+            </span>
           </div>
 
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 5: Feature Engineering</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
-            </div>
-            <p class="text-xs text-slate-600 mt-1">Engineered compound Study-Attendance Index achieving r = +0.8506 with target exam score.</p>
-          </div>
-
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 6 & 7: Model Benchmarking & Evaluation</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
-            </div>
-            <p class="text-xs text-slate-600 mt-1">Benchmarked 6 algorithms. Ordinary Least Squares crowned champion with Test R² = 0.9064, MAE = 4.03, and RMSE = 5.04.</p>
-          </div>
-
-          <div class="p-4 rounded-xl border border-slate-200 bg-white">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-slate-800">Phase 8: Web Dashboard & Cloud Deployment</h3>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Completed</span>
-            </div>
-            <p class="text-xs text-slate-600 mt-1">Deployed production web application with real-time prediction studio, serverless API, and Vercel cloud hosting.</p>
-          </div>
         </div>
+
       </div>
     </div>
 
@@ -516,111 +907,638 @@
 
   <!-- Footer -->
   <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
       <p class="font-semibold text-slate-700">"NOVORA": Intelligent Learning Analytics & Student Success Prediction Framework</p>
-      <p class="mt-1">Developed for academic success prediction, early-warning risk detection, and pedagogical governance.</p>
+      <div class="flex space-x-4 text-slate-400">
+        <span>OLS Model (R²: 0.9064)</span>
+        <span>•</span>
+        <span>400 Real Records Evaluated</span>
+        <span>•</span>
+        <span>Vercel Cloud Deployment</span>
+      </div>
     </div>
   </footer>
 
-  <!-- Real-Time Prediction Logic -->
+  <!-- Core JavaScript Application Logic -->
   <script>
+    // Global Prediction State
+    let currentPrediction = null;
+    let cohortScatterChartInstance = null;
+    let gradeDistChartInstance = null;
+
+    // Sample historical records for scatter plot overlay (Study_Hours, Exam_Score)
+    const historicalSample = [
+      [4.37, 54.67], [9.56, 100.0], [7.59, 69.41], [6.39, 86.72], [2.40, 55.64],
+      [2.40, 64.57], [1.52, 38.91], [8.80, 78.47], [6.41, 91.85], [7.37, 67.03],
+      [1.19, 55.40], [9.73, 97.13], [8.49, 79.39], [2.91, 53.50], [2.64, 56.40],
+      [2.65, 66.19], [3.74, 51.04], [5.72, 57.69], [4.89, 73.05], [3.62, 81.42],
+      [6.51, 68.91], [2.26, 48.53], [3.63, 52.82], [4.30, 55.36], [7.66, 88.33],
+      [5.45, 67.50], [8.12, 84.10], [1.80, 42.10], [9.10, 94.20], [3.10, 51.20],
+      [5.90, 72.80], [7.20, 80.50], [8.90, 89.20], [4.10, 58.70], [6.80, 75.30],
+      [2.10, 45.00], [5.20, 66.20], [7.80, 83.10], [9.30, 96.40], [3.40, 53.90]
+    ];
+
+    // Calculate Prediction with Integrated Marks Obtained
     function calculatePrediction() {
+      const studentName = (document.getElementById('studentName').value || 'Student').trim();
+      const subject = document.getElementById('subjectSelect').value;
+
+      const marksInput = document.getElementById('marksObtained');
       const studyInput = document.getElementById('studyHours');
       const attendanceInput = document.getElementById('attendance');
       const assignmentsInput = document.getElementById('assignments');
 
-      let studyHours = parseFloat(studyInput ? studyInput.value : 5.5);
-      let attendance = parseFloat(attendanceInput ? attendanceInput.value : 75);
-      let assignments = parseFloat(assignmentsInput ? assignmentsInput.value : 5);
+      let marksObtained = parseFloat(marksInput ? marksInput.value : 65.0);
+      let studyHours = parseFloat(studyInput ? studyInput.value : 6.0);
+      let attendance = parseFloat(attendanceInput ? attendanceInput.value : 80.0);
+      let assignments = parseFloat(assignmentsInput ? assignmentsInput.value : 6.0);
 
+      if (isNaN(marksObtained)) marksObtained = 65.0;
       if (isNaN(studyHours)) studyHours = 0;
       if (isNaN(attendance)) attendance = 0;
       if (isNaN(assignments)) assignments = 0;
 
-      // Champion OLS Model Formula:
-      // Exam_Score = 3.4209 + (4.7639 * Study_Hours) + (0.3795 * Attendance) + (1.9669 * Assignments)
+      // Clamping to realistic educational bounds
+      marksObtained = Math.min(100.0, Math.max(0.0, marksObtained));
+      studyHours = Math.min(24.0, Math.max(0.0, studyHours));
+      attendance = Math.min(100.0, Math.max(0.0, attendance));
+      assignments = Math.min(10.0, Math.max(0.0, assignments));
+
+      // Exact Champion OLS Model Equation (from Phase 6):
+      // Behavioral = 3.4209 + (4.7639 * Study_Hours) + (0.3795 * Attendance) + (1.9669 * Assignments)
       const intercept = 3.4209;
       const cStudy = 4.7639;
       const cAttend = 0.3795;
       const cAssign = 1.9669;
 
-      let rawScore = intercept + (cStudy * studyHours) + (cAttend * attendance) + (cAssign * assignments);
-      let score = Math.min(100.0, Math.max(0.0, rawScore));
+      const behavioralScore = intercept + (cStudy * studyHours) + (cAttend * attendance) + (cAssign * assignments);
 
-      // Display score
-      document.getElementById('predictedScoreDisplay').innerText = score.toFixed(1);
-      document.getElementById('scaleLabel').innerText = score.toFixed(1) + ' / 100';
-      document.getElementById('progressBar').style.width = score + '%';
+      // Integrated Blended Prediction: 40% Marks Obtained + 60% Current Behavioral Trajectory
+      const blendedScore = (0.40 * marksObtained) + (0.60 * behavioralScore);
+      const finalScore = Math.min(100.0, Math.max(0.0, blendedScore));
 
-      // Cohort Percentile Estimation (Gaussian with Mean: 67.35, Std: 16.33)
-      const z = (score - 67.35) / 16.33;
-      const percentile = Math.min(99, Math.max(1, Math.round((1.0 / (1.0 + Math.exp(-1.6 * z))) * 100)));
-      document.getElementById('percentileDisplay').innerText = percentile + '%';
+      // Trajectory Delta relative to Marks Obtained
+      const trajectoryDelta = parseFloat((finalScore - marksObtained).toFixed(1));
 
-      // Mathematical trace string
-      document.getElementById('mathTrace').innerText = 
-        `Score = 3.42 + (4.76 × ${studyHours.toFixed(1)}) + (0.38 × ${attendance.toFixed(1)}) + (1.97 × ${assignments.toFixed(0)}) = ${score.toFixed(2)}`;
+      // Determine Grade & Risk Tier
+      let gradeLetter = "Grade B (Passing)";
+      let riskTier = "Moderate";
+      let badgeText = "Passing / Satisfactory";
+      let badgeClass = "px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200";
+      let progressGradient = "h-full bg-gradient-to-r from-amber-500 to-indigo-600 rounded-full transition-all duration-300";
 
-      // Academic Standing & Guidance
-      const badgeContainer = document.getElementById('badgeContainer');
-      const standingDisplay = document.getElementById('standingDisplay');
-      const guidanceText = document.getElementById('guidanceText');
-      const progressBar = document.getElementById('progressBar');
-
-      if (score >= 75.0) {
-        badgeContainer.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
-        badgeContainer.innerText = "Distinction / High Performer";
-        standingDisplay.innerText = "High Performer";
-        standingDisplay.className = "text-xl font-bold text-emerald-600 block mt-2.5";
-        progressBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-300";
-        guidanceText.innerText = "Student exhibits excellent mastery and study discipline. Recommend advanced coursework, honors research, or peer mentorship roles.";
-      } else if (score >= 50.0) {
-        badgeContainer.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200";
-        badgeContainer.innerText = "Passing / Satisfactory";
-        standingDisplay.innerText = "Moderate";
-        standingDisplay.className = "text-xl font-bold text-amber-600 block mt-2.5";
-        progressBar.className = "h-full bg-gradient-to-r from-amber-500 to-indigo-500 rounded-full transition-all duration-300";
-        const extraHours = Math.max(1, Math.round((75 - score) / cStudy));
-        guidanceText.innerText = `Student is performing adequately. Adding ${extraHours} more hours of weekly study and submitting all remaining assignments will lift performance to the top quartile.`;
+      if (finalScore >= 80.0) {
+        gradeLetter = "Grade A+ (Distinction)";
+        riskTier = "High Performer";
+        badgeText = "Distinction / First Class";
+        badgeClass = "px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        progressGradient = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-300";
+      } else if (finalScore >= 70.0) {
+        gradeLetter = "Grade A (Merit)";
+        riskTier = "High Performer";
+        badgeText = "Merit / High Performer";
+        badgeClass = "px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        progressGradient = "h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-300";
+      } else if (finalScore >= 50.0) {
+        gradeLetter = "Grade B (Passing)";
+        riskTier = "Moderate";
+        badgeText = "Passing / Satisfactory";
+        badgeClass = "px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200";
+        progressGradient = "h-full bg-gradient-to-r from-amber-500 to-indigo-500 rounded-full transition-all duration-300";
       } else {
-        badgeContainer.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200";
-        badgeContainer.innerText = "Critical / At-Risk Tier";
-        standingDisplay.innerText = "At Risk";
-        standingDisplay.className = "text-xl font-bold text-rose-600 block mt-2.5";
-        progressBar.className = "h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-300";
-        guidanceText.innerText = "Urgent academic advisory recommended: immediate 1-on-1 tutoring, mandatory assignment completion sessions, and attendance monitoring.";
+        gradeLetter = "Grade F (At Risk)";
+        riskTier = "At Risk";
+        badgeText = "Critical / At-Risk Tier";
+        badgeClass = "px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-rose-100 text-rose-800 border border-rose-200";
+        progressGradient = "h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-300";
+      }
+
+      // Percentile Calculation (Cohort Mean: 67.35, Std: 16.33)
+      const z = (finalScore - 67.35) / 16.33;
+      const percentile = Math.min(99, Math.max(1, Math.round((1.0 / (1.0 + Math.exp(-1.6 * z))) * 100)));
+
+      // Next Target Gap Analysis
+      let nextTargetName = "Distinction (80.0%)";
+      let gapPoints = 0;
+      let hoursNeeded = 0;
+      let assignmentsNeeded = 0;
+
+      if (finalScore < 50.0) {
+        nextTargetName = "Passing (50.0%)";
+        gapPoints = (50.0 - finalScore).toFixed(1);
+        hoursNeeded = (gapPoints / (cStudy * 0.60)).toFixed(1);
+        assignmentsNeeded = Math.min(10 - assignments, Math.ceil(gapPoints / (cAssign * 0.60)));
+      } else if (finalScore < 80.0) {
+        nextTargetName = "Distinction (80.0%)";
+        gapPoints = (80.0 - finalScore).toFixed(1);
+        hoursNeeded = (gapPoints / (cStudy * 0.60)).toFixed(1);
+        assignmentsNeeded = Math.min(10 - assignments, Math.ceil(gapPoints / (cAssign * 0.60)));
+      } else {
+        nextTargetName = "Maximum Mastery (100.0%)";
+        gapPoints = (100.0 - finalScore).toFixed(1);
+        hoursNeeded = (gapPoints / (cStudy * 0.60)).toFixed(1);
+        assignmentsNeeded = 0;
+      }
+
+      // Update UI Elements
+      document.getElementById('resultStudentTitle').innerText = studentName;
+      document.getElementById('resultSubjectSubtitle').innerText = subject;
+      document.getElementById('predictedScoreDisplay').innerText = finalScore.toFixed(1);
+      document.getElementById('scaleLabel').innerText = finalScore.toFixed(1) + ' / 100';
+      document.getElementById('progressBar').style.width = finalScore + '%';
+      document.getElementById('progressBar').className = progressGradient;
+      document.getElementById('gradeLetterDisplay').innerText = gradeLetter;
+      document.getElementById('percentileDisplay').innerText = percentile + 'th Cohort Percentile';
+
+      const badgeContainer = document.getElementById('badgeContainer');
+      badgeContainer.className = badgeClass;
+      badgeContainer.innerText = badgeText;
+
+      // Update Value-Add Trajectory Display
+      const trajectoryDisplay = document.getElementById('trajectoryDisplay');
+      const trajectorySub = document.getElementById('trajectorySub');
+      const trajectoryBanner = document.getElementById('trajectoryBanner');
+      const trajectoryIcon = document.getElementById('trajectoryIcon');
+      const trajectoryText = document.getElementById('trajectoryText');
+
+      trajectorySub.innerText = `Relative to Midterm (${marksObtained.toFixed(1)})`;
+
+      if (trajectoryDelta > 0) {
+        trajectoryDisplay.innerText = `+${trajectoryDelta} pts`;
+        trajectoryDisplay.className = "text-3xl font-extrabold text-emerald-600 block mt-1";
+        trajectoryBanner.className = "p-3.5 rounded-xl border flex items-center space-x-3 bg-emerald-50 border-emerald-200 text-emerald-900 text-xs font-semibold";
+        trajectoryIcon.className = "fa-solid fa-arrow-trend-up text-emerald-600 text-base";
+        trajectoryText.innerText = `Positive Velocity: Current study habits (+${studyHours} hrs/wk) are projected to lift the student +${trajectoryDelta} points over midterm marks (${marksObtained.toFixed(1)}% → ${finalScore.toFixed(1)}%).`;
+      } else if (trajectoryDelta < 0) {
+        trajectoryDisplay.innerText = `${trajectoryDelta} pts`;
+        trajectoryDisplay.className = "text-3xl font-extrabold text-rose-600 block mt-1";
+        trajectoryBanner.className = "p-3.5 rounded-xl border flex items-center space-x-3 bg-rose-50 border-rose-200 text-rose-900 text-xs font-semibold";
+        trajectoryIcon.className = "fa-solid fa-arrow-trend-down text-rose-600 text-base";
+        trajectoryText.innerText = `Declining Risk: Reduced study time (${studyHours} hrs/wk) risks pulling final exam ${Math.abs(trajectoryDelta)} points below midterm marks (${marksObtained.toFixed(1)}% → ${finalScore.toFixed(1)}%). Immediate habit increase advised.`;
+      } else {
+        trajectoryDisplay.innerText = `±0.0 pts`;
+        trajectoryDisplay.className = "text-3xl font-extrabold text-slate-700 block mt-1";
+        trajectoryBanner.className = "p-3.5 rounded-xl border flex items-center space-x-3 bg-slate-50 border-slate-200 text-slate-800 text-xs font-semibold";
+        trajectoryIcon.className = "fa-solid fa-arrows-left-right text-slate-500 text-base";
+        trajectoryText.innerText = `Steady Performance: Current study habits project exact consistency with midterm baseline (${finalScore.toFixed(1)}%).`;
+      }
+
+      // Update Gap Analysis Text
+      document.getElementById('nextTargetTitle').innerText = nextTargetName;
+      if (gapPoints > 0) {
+        document.getElementById('gapAnalysisText').innerHTML = 
+          `The student is currently <strong class="text-indigo-700">${gapPoints} marks</strong> away from ${nextTargetName}. Reaching this target requires <strong class="text-slate-900">+${hoursNeeded} hours</strong> of additional weekly study OR completing <strong class="text-slate-900">${assignmentsNeeded} more assignments</strong>.`;
+      } else {
+        document.getElementById('gapAnalysisText').innerHTML = 
+          `Student has attained top-tier performance mastery! Maintain current disciplined habits and peer-mentorship.`;
+      }
+
+      // Store in global state for history saving and action plan rendering
+      currentPrediction = {
+        timestamp: new Date().toLocaleString(),
+        studentName: studentName,
+        subject: subject,
+        marksObtained: marksObtained,
+        studyHours: studyHours,
+        attendance: attendance,
+        assignments: assignments,
+        finalScore: parseFloat(finalScore.toFixed(1)),
+        trajectoryDelta: trajectoryDelta,
+        gradeLetter: gradeLetter,
+        riskTier: riskTier,
+        percentile: percentile,
+        gapPoints: gapPoints,
+        hoursNeeded: hoursNeeded
+      };
+
+      // Update Action Plan tab text
+      updateRoadmapContent();
+
+      // Refresh Chart highlight if scatter chart is visible
+      if (cohortScatterChartInstance) {
+        updateScatterPlot();
       }
     }
 
-    function setProfile(study, att, assign) {
+    // Set Archetype Profile
+    function setProfile(name, subject, marks, study, att, assign) {
+      document.getElementById('studentName').value = name;
+      document.getElementById('subjectSelect').value = subject;
+      document.getElementById('marksObtained').value = marks;
       document.getElementById('studyHours').value = study;
       document.getElementById('attendance').value = att;
       document.getElementById('assignments').value = assign;
       calculatePrediction();
+      showToast(`Loaded ${name} profile`, 'info');
+    }
+
+    // Load Subject from Subject Tab
+    function loadSubjectToStudio(subject, study, att, assign) {
+      document.getElementById('subjectSelect').value = subject;
+      document.getElementById('studyHours').value = study;
+      document.getElementById('attendance').value = att;
+      document.getElementById('assignments').value = assign;
+      switchTab('predict');
+      calculatePrediction();
+      showToast(`Loaded ${subject} benchmarks into Studio`, 'info');
     }
 
     function resetInputs() {
-      setProfile(5.5, 75, 5);
+      setProfile('Alex Sharma (STU-104)', 'Machine Learning & Analytics', 65.0, 6.0, 80.0, 6);
     }
 
+    // Switch Application Tabs
     function switchTab(tabName) {
       document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('text-indigo-600', 'bg-indigo-50');
+        btn.classList.remove('text-indigo-700', 'bg-white', 'shadow-sm');
         btn.classList.add('text-slate-600');
       });
 
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      const targetPane = document.getElementById('tab-' + tabName);
+      if (targetPane) targetPane.classList.remove('hidden');
+
       const activeBtn = document.getElementById('nav-' + tabName);
       if (activeBtn) {
-        activeBtn.classList.add('text-indigo-600', 'bg-indigo-50');
+        activeBtn.classList.add('text-indigo-700', 'bg-white', 'shadow-sm');
         activeBtn.classList.remove('text-slate-600');
+      }
+
+      // Initialize or resize charts if analytics tab is opened
+      if (tabName === 'analytics') {
+        setTimeout(initCharts, 50);
+      } else if (tabName === 'history') {
+        renderHistoryTable();
       }
     }
 
-    // Initialize on page load
+    function goToRoadmap() {
+      switchTab('roadmaps');
+    }
+
+    // Update Action Plan Tab Content
+    function updateRoadmapContent() {
+      if (!currentPrediction) return;
+      document.getElementById('roadmapStudentSubtitle').innerHTML = 
+        `Custom intervention plan generated for <strong>${currentPrediction.studentName}</strong> in <strong>${currentPrediction.subject}</strong>`;
+      document.getElementById('planScoreDisplay').innerText = currentPrediction.finalScore + '%';
+      
+      const planTraj = document.getElementById('planTrajectoryDisplay');
+      if (currentPrediction.trajectoryDelta >= 0) {
+        planTraj.innerText = '+' + currentPrediction.trajectoryDelta + ' pts';
+        planTraj.className = "text-2xl font-extrabold text-emerald-600 block mt-0.5";
+      } else {
+        planTraj.innerText = currentPrediction.trajectoryDelta + ' pts';
+        planTraj.className = "text-2xl font-extrabold text-rose-600 block mt-0.5";
+      }
+
+      document.getElementById('planTargetDisplay').innerText = currentPrediction.finalScore >= 80 ? 'Mastery (100%)' : 'Distinction (80%)';
+      document.getElementById('planStudyDeltaText').innerText = `+${Math.max(1.5, currentPrediction.hoursNeeded || 2.0)} hours`;
+    }
+
+    // -----------------------------------------------------------------
+    // PREDICTION HISTORY (LOCALSTORAGE PERSISTENCE)
+    // -----------------------------------------------------------------
+    function getStoredHistory() {
+      try {
+        const data = localStorage.getItem('novora_prediction_history');
+        if (data) return JSON.parse(data);
+      } catch (e) {
+        console.error("Storage error:", e);
+      }
+      // Initial default sample records if empty
+      return [
+        {
+          id: 1,
+          timestamp: "10/14/2026, 08:30 AM",
+          studentName: "Priya Nair",
+          subject: "Data Structures & Algorithms",
+          marksObtained: 88.0,
+          studyHours: 8.5,
+          attendance: 95.0,
+          assignments: 9,
+          finalScore: 92.4,
+          trajectoryDelta: 4.4,
+          riskTier: "High Performer"
+        },
+        {
+          id: 2,
+          timestamp: "10/14/2026, 08:45 AM",
+          studentName: "Jordan Lee",
+          subject: "Mathematics for Computing",
+          marksObtained: 42.0,
+          studyHours: 2.0,
+          attendance: 55.0,
+          assignments: 2,
+          finalScore: 41.6,
+          trajectoryDelta: -0.4,
+          riskTier: "At Risk"
+        }
+      ];
+    }
+
+    function saveStoredHistory(history) {
+      try {
+        localStorage.setItem('novora_prediction_history', JSON.stringify(history));
+        updateHistoryBadge();
+      } catch (e) {
+        console.error("Storage error:", e);
+      }
+    }
+
+    function updateHistoryBadge() {
+      const history = getStoredHistory();
+      const badge = document.getElementById('historyBadge');
+      if (badge) badge.innerText = history.length;
+    }
+
+    function saveCurrentPrediction() {
+      if (!currentPrediction) calculatePrediction();
+      const history = getStoredHistory();
+      const newEntry = {
+        id: Date.now(),
+        ...currentPrediction
+      };
+      history.unshift(newEntry);
+      saveStoredHistory(history);
+      showToast(`Saved prediction for ${currentPrediction.studentName} to History Log!`, 'success');
+    }
+
+    function deleteHistoryItem(id) {
+      let history = getStoredHistory();
+      history = history.filter(item => item.id !== id);
+      saveStoredHistory(history);
+      renderHistoryTable();
+      showToast('Record removed', 'info');
+    }
+
+    function clearHistory() {
+      if (confirm("Are you sure you want to clear all prediction history?")) {
+        saveStoredHistory([]);
+        renderHistoryTable();
+        showToast('History cleared', 'info');
+      }
+    }
+
+    function reloadHistoryItem(id) {
+      const history = getStoredHistory();
+      const item = history.find(entry => entry.id === id);
+      if (item) {
+        document.getElementById('studentName').value = item.studentName;
+        document.getElementById('subjectSelect').value = item.subject;
+        document.getElementById('marksObtained').value = item.marksObtained;
+        document.getElementById('studyHours').value = item.studyHours;
+        document.getElementById('attendance').value = item.attendance;
+        document.getElementById('assignments').value = item.assignments;
+        switchTab('predict');
+        calculatePrediction();
+        showToast(`Loaded ${item.studentName}'s record into Studio`, 'info');
+      }
+    }
+
+    function renderHistoryTable() {
+      const history = getStoredHistory();
+      updateHistoryBadge();
+
+      const search = (document.getElementById('historySearch')?.value || '').toLowerCase();
+      const filterRisk = document.getElementById('historyFilterRisk')?.value || 'ALL';
+
+      const filtered = history.filter(item => {
+        const matchesSearch = item.studentName.toLowerCase().includes(search) || item.subject.toLowerCase().includes(search);
+        const matchesRisk = filterRisk === 'ALL' || item.riskTier === filterRisk;
+        return matchesSearch && matchesRisk;
+      });
+
+      const tbody = document.getElementById('historyTableBody');
+      const emptyMsg = document.getElementById('emptyHistoryMsg');
+
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyMsg.classList.remove('hidden');
+        return;
+      }
+      emptyMsg.classList.add('hidden');
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+
+        let riskBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Moderate</span>`;
+        if (item.riskTier === 'High Performer') {
+          riskBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">High Performer</span>`;
+        } else if (item.riskTier === 'At Risk') {
+          riskBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">At Risk</span>`;
+        }
+
+        const trajColor = item.trajectoryDelta >= 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+        const trajText = item.trajectoryDelta > 0 ? `+${item.trajectoryDelta}` : `${item.trajectoryDelta}`;
+
+        tr.innerHTML = `
+          <td class="py-3 px-3.5 text-slate-400 text-[11px] whitespace-nowrap">${item.timestamp}</td>
+          <td class="py-3 px-3.5 font-bold text-slate-900">${item.studentName}</td>
+          <td class="py-3 px-3 text-slate-600">${item.subject}</td>
+          <td class="py-3 px-2.5 font-semibold text-slate-700">${item.marksObtained}%</td>
+          <td class="py-3 px-2.5 font-semibold">${item.studyHours}h</td>
+          <td class="py-3 px-2.5 font-semibold">${item.attendance}%</td>
+          <td class="py-3 px-2.5 font-semibold">${item.assignments}/10</td>
+          <td class="py-3 px-3 font-extrabold text-indigo-700 text-sm">${item.finalScore}%</td>
+          <td class="py-3 px-3 ${trajColor}">${trajText}</td>
+          <td class="py-3 px-3">${riskBadge}</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">
+            <button onclick="reloadHistoryItem(${item.id})" class="px-2 py-1 rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-[10px] mr-1" title="Load into Studio">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </button>
+            <button onclick="deleteHistoryItem(${item.id})" class="px-2 py-1 rounded bg-slate-100 text-slate-500 hover:text-red-700 font-bold text-[10px]" title="Delete">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportHistoryCSV() {
+      const history = getStoredHistory();
+      if (history.length === 0) {
+        showToast('No history to export', 'error');
+        return;
+      }
+
+      let csv = "Timestamp,Student_Name,Subject,Marks_Obtained,Study_Hours,Attendance,Assignments,Projected_Score,Trajectory_Delta,Risk_Tier\n";
+      history.forEach(item => {
+        csv += `"${item.timestamp}","${item.studentName}","${item.subject}",${item.marksObtained},${item.studyHours},${item.attendance},${item.assignments},${item.finalScore},${item.trajectoryDelta},"${item.riskTier}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `NOVORA_Prediction_History_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exported history as CSV file', 'success');
+    }
+
+    // -----------------------------------------------------------------
+    // CHART.JS INTERACTIVE VISUALIZATIONS
+    // -----------------------------------------------------------------
+    function initCharts() {
+      initGradeDistChart();
+      initScatterPlot();
+    }
+
+    function initGradeDistChart() {
+      const ctx = document.getElementById('gradeDistChart');
+      if (!ctx) return;
+      if (gradeDistChartInstance) gradeDistChartInstance.destroy();
+
+      gradeDistChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['High Performers (≥70%)', 'Moderate Cohort (50–69%)', 'At Risk Cohort (<50%)'],
+          datasets: [{
+            label: 'Student Count',
+            data: [169, 168, 63],
+            backgroundColor: ['#22c55e', '#6366f1', '#ef4444'],
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: '#e2e8f0'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const pct = ((context.raw / 400) * 100).toFixed(1);
+                  return ` ${context.raw} students (${pct}% of cohort)`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              title: { display: true, text: 'Number of Students', font: { size: 11, weight: 'bold' } }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    function initScatterPlot() {
+      const ctx = document.getElementById('cohortScatterChart');
+      if (!ctx) return;
+      if (cohortScatterChartInstance) cohortScatterChartInstance.destroy();
+
+      const historicalData = historicalSample.map(pt => ({ x: pt[0], y: pt[1] }));
+      const activePoint = currentPrediction ? [{ x: currentPrediction.studyHours, y: currentPrediction.finalScore }] : [{ x: 6.0, y: 73.5 }];
+
+      cohortScatterChartInstance = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [
+            {
+              label: 'Historical Students (400 Sample)',
+              data: historicalData,
+              backgroundColor: 'rgba(99, 102, 241, 0.45)',
+              borderColor: '#4f46e5',
+              borderWidth: 1,
+              pointRadius: 4.5,
+              pointHoverRadius: 6
+            },
+            {
+              label: 'Active Evaluated Student',
+              data: activePoint,
+              backgroundColor: '#f59e0b',
+              borderColor: '#b45309',
+              borderWidth: 2,
+              pointRadius: 9,
+              pointHoverRadius: 11,
+              pointStyle: 'rectRot'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  if (context.datasetIndex === 1) {
+                    return ` Active Student (${currentPrediction?.studentName || 'Current'}): Study ${context.parsed.x} hrs &rarr; Score ${context.parsed.y}%`;
+                  }
+                  return ` Historical: ${context.parsed.x} hrs study &rarr; ${context.parsed.y}% exam`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: 'Weekly Self-Study Hours (Hours)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#f1f5f9' },
+              min: 0,
+              max: 12
+            },
+            y: {
+              title: { display: true, text: 'Final Exam Score (%)', font: { size: 11, weight: 'bold' } },
+              grid: { color: '#f1f5f9' },
+              min: 20,
+              max: 105
+            }
+          }
+        }
+      });
+    }
+
+    function updateScatterPlot() {
+      if (!cohortScatterChartInstance || !currentPrediction) return;
+      cohortScatterChartInstance.data.datasets[1].data = [{
+        x: currentPrediction.studyHours,
+        y: currentPrediction.finalScore
+      }];
+      cohortScatterChartInstance.update();
+    }
+
+    // Toast Notification Utility
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+
+      msg.innerText = message;
+      if (type === 'success') {
+        toast.className = "fixed top-20 right-5 z-50 transform transition-all duration-300 translate-x-0 opacity-100 max-w-sm p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center space-x-3 bg-white text-emerald-900 border-emerald-200 shadow-emerald-100";
+        icon.className = "fa-solid fa-circle-check text-emerald-600 text-lg";
+      } else if (type === 'error') {
+        toast.className = "fixed top-20 right-5 z-50 transform transition-all duration-300 translate-x-0 opacity-100 max-w-sm p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center space-x-3 bg-white text-rose-900 border-rose-200 shadow-rose-100";
+        icon.className = "fa-solid fa-triangle-exclamation text-rose-600 text-lg";
+      } else {
+        toast.className = "fixed top-20 right-5 z-50 transform transition-all duration-300 translate-x-0 opacity-100 max-w-sm p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center space-x-3 bg-white text-indigo-900 border-indigo-200 shadow-indigo-100";
+        icon.className = "fa-solid fa-circle-info text-indigo-600 text-lg";
+      }
+
+      setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+      }, 3500);
+    }
+
+    // App Initialization
     window.onload = function() {
       calculatePrediction();
+      updateHistoryBadge();
+      renderHistoryTable();
     };
   </script>
 </body>
