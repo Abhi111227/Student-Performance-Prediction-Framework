@@ -103,83 +103,134 @@
     <div id="tab-predict" class="tab-pane space-y-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- Input Parameters Card (5 Cols) -->
+        <!-- Direct Manual Input System Card (5 Cols) -->
         <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
           <div class="flex items-center justify-between pb-4 border-b border-slate-100">
             <div>
-              <h2 class="text-lg font-bold text-slate-900">Student Behavioral Metrics</h2>
-              <p class="text-xs text-slate-500">Adjust parameters to simulate student academic trajectory</p>
+              <div class="flex items-center space-x-2">
+                <span class="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold">
+                  <i class="fa-solid fa-keyboard"></i>
+                </span>
+                <h2 class="text-lg font-bold text-slate-900">Direct Data Input</h2>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Enter student metrics directly to generate instant prediction</p>
             </div>
-            <button onclick="resetInputs()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition">
+            <button onclick="resetInputs()" class="text-xs font-semibold text-slate-500 hover:text-indigo-600 px-2 py-1 rounded border border-slate-200 hover:border-indigo-200 transition">
               <i class="fa-solid fa-rotate-left mr-1"></i>Reset
             </button>
           </div>
 
-          <div class="space-y-6 mt-6">
-            <!-- Study Hours Slider -->
+          <form id="predictionForm" onsubmit="event.preventDefault(); calculatePrediction();" class="space-y-5 mt-6">
+            <!-- Study Hours Direct Input -->
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center">
+              <label for="studyHours" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+                <span class="flex items-center">
                   <i class="fa-solid fa-clock text-indigo-500 mr-2"></i>Weekly Self-Study Hours
-                </label>
-                <span id="studyHoursVal" class="text-sm font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">5.5 hrs</span>
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Scale: 0 – 24 hrs</span>
+              </label>
+              <div class="relative rounded-xl shadow-sm">
+                <input 
+                  type="number" 
+                  id="studyHours" 
+                  step="0.1" 
+                  min="0" 
+                  max="24" 
+                  value="5.5" 
+                  placeholder="e.g. 6.0" 
+                  required
+                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-16 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  oninput="calculatePrediction()"
+                >
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                  <span class="text-xs font-bold text-slate-400 uppercase">Hours</span>
+                </div>
               </div>
-              <input type="range" id="studyHours" min="0" max="15" step="0.25" value="5.5" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" oninput="calculatePrediction()">
-              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>0 hrs (No study)</span>
-                <span>5.5 hrs (Avg)</span>
-                <span>15 hrs (Intensive)</span>
-              </div>
+              <p class="text-[11px] text-slate-500 mt-1">Average study time dedicated outside lecture hours.</p>
             </div>
 
-            <!-- Attendance Slider -->
+            <!-- Attendance Percentage Direct Input -->
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center">
+              <label for="attendance" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+                <span class="flex items-center">
                   <i class="fa-solid fa-user-check text-emerald-500 mr-2"></i>Class Attendance Rate
-                </label>
-                <span id="attendanceVal" class="text-sm font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">75%</span>
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Scale: 0 – 100%</span>
+              </label>
+              <div class="relative rounded-xl shadow-sm">
+                <input 
+                  type="number" 
+                  id="attendance" 
+                  step="0.5" 
+                  min="0" 
+                  max="100" 
+                  value="75" 
+                  placeholder="e.g. 85" 
+                  required
+                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-12 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  oninput="calculatePrediction()"
+                >
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                  <span class="text-sm font-bold text-slate-400">%</span>
+                </div>
               </div>
-              <input type="range" id="attendance" min="0" max="100" step="1" value="75" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" oninput="calculatePrediction()">
-              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>0% (Chronic Absenteeism)</span>
-                <span>75% (Standard)</span>
-                <span>100% (Perfect)</span>
-              </div>
+              <p class="text-[11px] text-slate-500 mt-1">Percentage of lecture sessions attended throughout the term.</p>
             </div>
 
-            <!-- Assignments Completed Slider -->
+            <!-- Assignments Completed Direct Input -->
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <label class="text-sm font-semibold text-slate-700 flex items-center">
+              <label for="assignments" class="flex justify-between items-center text-sm font-semibold text-slate-700 mb-1.5">
+                <span class="flex items-center">
                   <i class="fa-solid fa-list-check text-amber-500 mr-2"></i>Assignments Completed
-                </label>
-                <span id="assignmentsVal" class="text-sm font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700">5 / 10</span>
+                </span>
+                <span class="text-xs font-semibold text-slate-400">Quota: 0 – 10 tasks</span>
+              </label>
+              <div class="relative rounded-xl shadow-sm">
+                <input 
+                  type="number" 
+                  id="assignments" 
+                  step="1" 
+                  min="0" 
+                  max="10" 
+                  value="5" 
+                  placeholder="e.g. 7" 
+                  required
+                  class="block w-full rounded-xl border border-slate-300 pl-4 pr-16 py-3 text-slate-900 font-bold text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition bg-white"
+                  oninput="calculatePrediction()"
+                >
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                  <span class="text-xs font-bold text-slate-400">/ 10</span>
+                </div>
               </div>
-              <input type="range" id="assignments" min="0" max="10" step="1" value="5" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" oninput="calculatePrediction()">
-              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
-                <span>0 (None submitted)</span>
-                <span>5 (Half quota)</span>
-                <span>10 (Full quota)</span>
-              </div>
+              <p class="text-[11px] text-slate-500 mt-1">Number of continuous evaluation assignments submitted.</p>
             </div>
 
-            <!-- Preset Profiles -->
-            <div class="pt-4 border-t border-slate-100">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">Quick Archetype Profiles</span>
-              <div class="grid grid-cols-3 gap-2">
-                <button onclick="setProfile(2.0, 55, 2)" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition">
-                  ⚠️ At-Risk Student
-                </button>
-                <button onclick="setProfile(5.5, 75, 5)" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition">
-                  👤 Average Student
-                </button>
-                <button onclick="setProfile(8.5, 95, 9)" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">
-                  ⭐ Top Performer
-                </button>
-              </div>
-            </div>
+            <!-- Primary Prediction Action Button -->
+            <button 
+              type="submit" 
+              class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-200 hover:shadow-indigo-300 transition flex items-center justify-center space-x-2 active:scale-[0.99]"
+            >
+              <i class="fa-solid fa-calculator text-base"></i>
+              <span>Calculate & Predict Exam Score</span>
+            </button>
+          </form>
 
+          <!-- Quick Archetype Preset Buttons -->
+          <div class="pt-5 mt-6 border-t border-slate-100">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2.5">
+              <i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Quick Sample Archetypes
+            </span>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setProfile(2.0, 55, 2)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition text-center">
+                ⚠️ At-Risk
+              </button>
+              <button onclick="setProfile(5.5, 75, 5)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition text-center">
+                👤 Average
+              </button>
+              <button onclick="setProfile(8.5, 95, 9)" class="px-2.5 py-2 text-xs font-semibold rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition text-center">
+                ⭐ Top Scorer
+              </button>
+            </div>
           </div>
         </div>
 
@@ -474,13 +525,17 @@
   <!-- Real-Time Prediction Logic -->
   <script>
     function calculatePrediction() {
-      const studyHours = parseFloat(document.getElementById('studyHours').value);
-      const attendance = parseFloat(document.getElementById('attendance').value);
-      const assignments = parseFloat(document.getElementById('assignments').value);
+      const studyInput = document.getElementById('studyHours');
+      const attendanceInput = document.getElementById('attendance');
+      const assignmentsInput = document.getElementById('assignments');
 
-      document.getElementById('studyHoursVal').innerText = studyHours.toFixed(1) + ' hrs';
-      document.getElementById('attendanceVal').innerText = attendance + '%';
-      document.getElementById('assignmentsVal').innerText = assignments + ' / 10';
+      let studyHours = parseFloat(studyInput ? studyInput.value : 5.5);
+      let attendance = parseFloat(attendanceInput ? attendanceInput.value : 75);
+      let assignments = parseFloat(assignmentsInput ? assignmentsInput.value : 5);
+
+      if (isNaN(studyHours)) studyHours = 0;
+      if (isNaN(attendance)) attendance = 0;
+      if (isNaN(assignments)) assignments = 0;
 
       // Champion OLS Model Formula:
       // Exam_Score = 3.4209 + (4.7639 * Study_Hours) + (0.3795 * Attendance) + (1.9669 * Assignments)
@@ -504,7 +559,7 @@
 
       // Mathematical trace string
       document.getElementById('mathTrace').innerText = 
-        `Score = 3.42 + (4.76 × ${studyHours.toFixed(1)}) + (0.38 × ${attendance}) + (1.97 × ${assignments}) = ${score.toFixed(2)}`;
+        `Score = 3.42 + (4.76 × ${studyHours.toFixed(1)}) + (0.38 × ${attendance.toFixed(1)}) + (1.97 × ${assignments.toFixed(0)}) = ${score.toFixed(2)}`;
 
       // Academic Standing & Guidance
       const badgeContainer = document.getElementById('badgeContainer');
