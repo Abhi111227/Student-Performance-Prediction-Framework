@@ -1,0 +1,24 @@
+{
+    "phase": "Phase 4: Exploratory Data Analysis",
+    "cohort_counts": {
+        "High Performer": 169,
+        "Moderate": 168,
+        "At Risk": 63
+    },
+    "cohort_percentages": {
+        "High Performer": 42.25,
+        "Moderate": 42.0,
+        "At Risk": 15.75
+    },
+    "pearson_correlations_with_target": {
+        "Study_Hours": 0.8088001313442894,
+        "Assignments_Completed": 0.42290438039599576,
+        "Attendance": 0.3160594547558684
+    },
+    "key_insights": [
+        "Study Hours displays the highest correlation (r = +0.809) with Exam Score.",
+        "High Performers average > 6.5 hours of study per week and > 75% attendance.",
+        "Students in the 'At Risk' category (<50%) almost invariably study fewer than 3.5 hours weekly.",
+        "Assignments Completed exhibits a solid positive association (r = +0.423) with negligible collinearity to Study Hours."
+    ]
+}
