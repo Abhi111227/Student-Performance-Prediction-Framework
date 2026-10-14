@@ -1,0 +1,24 @@
+{
+  "name": "novora-student-success-prediction",
+  "version": "2.0.0",
+  "description": "NOVORA: Intelligent Learning Analytics and Student Success Prediction Framework",
+  "main": "api/predict.js",
+  "scripts": {
+    "start": "npx serve public",
+    "data-collect": "py -3 src/data_collection.py",
+    "preprocess": "py -3 src/preprocessing.py",
+    "eda": "py -3 src/eda.py",
+    "feature-eng": "py -3 src/feature_engineering.py",
+    "train": "py -3 src/model_training.py",
+    "deploy": "npx vercel --prod"
+  },
+  "keywords": [
+    "machine-learning",
+    "learning-analytics",
+    "student-performance-prediction",
+    "linear-regression",
+    "vercel"
+  ],
+  "author": "NOVORA Team",
+  "license": "MIT"
+}

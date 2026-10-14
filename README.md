@@ -1,88 +1,83 @@
 # 🎓 "NOVORA": Intelligent Learning Analytics & Student Success Prediction Framework
 
-A Machine Learning-based predictive analytics system engineered to forecast student academic performance and support data-driven pedagogical interventions.
+A comprehensive, production-grade Machine Learning predictive analytics platform engineered to forecast student academic performance (`Exam_Score`), identify at-risk learners early, and deliver proactive pedagogical interventions.
 
 ---
 
-## 📌 Project Overview
-The Student Performance Prediction System ("NOVORA") follows the complete **Machine Learning Development Lifecycle (MLDLC)** to model academic performance from historical educational and behavioral attributes:
-1. **Phase 1: Problem Understanding** `[COMPLETED]`
-2. **Phase 2: Data Collection & Profiling** `[COMPLETED]`
-3. **Phase 3: Data Preprocessing**
-4. **Phase 4: Exploratory Data Analysis (EDA)**
-5. **Phase 5: Feature Engineering**
-6. **Phase 6: Model Development**
-7. **Phase 7: Model Evaluation**
-8. **Phase 8: Model Deployment & Monitoring**
+## 📌 Project Architecture & Lifecycle Status
+
+| Phase | Description | Status | Primary Artifacts |
+| :--- | :--- | :---: | :--- |
+| **Phase 1: Problem Understanding** | Educational domain analysis, stakeholder mapping, regression formulation | ✅ Complete | [`reports/NOVORA_Comprehensive_ML_Report.md`](reports/NOVORA_Comprehensive_ML_Report.md) |
+| **Phase 2: Data Collection & Profiling** | 400 verified student records, schema validation, data dictionary | ✅ Complete | [`data/student_performance_data.csv`](data/student_performance_data.csv), [`src/data_collection.py`](src/data_collection.py) |
+| **Phase 3: Data Preprocessing** | 80/20 train-test partitioning (320/80), zero-leakage StandardScaler scaling | ✅ Complete | [`src/preprocessing.py`](src/preprocessing.py), [`data/train_data.csv`](data/train_data.csv) |
+| **Phase 4: Exploratory Analysis (EDA)** | Risk stratification (High Performer: 42.25%, Moderate: 42.0%, At Risk: 15.75%) | ✅ Complete | [`src/eda.py`](src/eda.py), [`reports/figures/eda/`](reports/figures/eda/) |
+| **Phase 5: Feature Engineering** | Compound `Study_Attendance_Index` achieving $r = +0.8506$ correlation | ✅ Complete | [`src/feature_engineering.py`](src/feature_engineering.py), [`data/train_features.csv`](data/train_features.csv) |
+| **Phase 6: Model Development** | Benchmarked 6 algorithms (OLS, Ridge, Lasso, CART, Random Forest, GBDT) | ✅ Complete | [`src/model_training.py`](src/model_training.py) |
+| **Phase 7: Model Evaluation** | Ordinary Least Squares champion: **Test $R^2 = 0.9064$**, **MAE = $4.03$ points** | ✅ Complete | [`models/best_model.joblib`](models/best_model.joblib), [`reports/model_leaderboard.csv`](reports/model_leaderboard.csv) |
+| **Phase 8: Web Dashboard & Deployment** | Responsive analytics dashboard, serverless prediction API, Vercel ready | ✅ Complete | [`public/index.html`](public/index.html), [`api/predict.js`](api/predict.js), [`vercel.json`](vercel.json) |
 
 ---
 
-## 📂 Project Repository Structure
-```
-Projectt/
-├── data/
-│   ├── student_performance_data.csv        # Primary dataset (400 samples, 4 features)
-│   └── data_dictionary.md                  # Comprehensive schema and feature dictionary
-├── notebooks/
-│   └── NOVORA_Phase1_Phase2_Data_Collection.ipynb  # Interactive walkthrough notebook
-├── reports/
-│   ├── NOVORA_Phase1_Phase2_Report.md      # Detailed academic and engineering report
-│   ├── data_summary.csv                    # Descriptive statistics export
-│   ├── correlation_matrix.csv              # Pearson correlation matrix
-│   ├── data_collection_audit.json          # Machine-readable audit output
-│   └── figures/
-│       ├── feature_distributions.png       # Histograms and KDE curves
-│       ├── feature_boxplots.png            # Boxplots for outlier inspection
-│       ├── correlation_heatmap.png         # Pearson correlation heatmap
-│       └── bivariate_scatterplots.png      # Scatterplots vs Exam_Score
-├── src/
-│   └── data_collection.py                  # Automated ingestion & profiling pipeline
-└── README.md                               # Project documentation
-```
+## 🏆 Model Performance Benchmark
+
+Evaluated on 80 unseen test records with 5-fold cross-validation:
+
+| Rank | Model Name | Test $R^2$ | Adjusted $R^2$ | Test MAE | Test RMSE | 5-Fold CV $R^2$ |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+| 🥇 | **Linear Regression (OLS)** | **$0.9064$** | **$0.9027$** | **$4.0298$** | **$5.0432$** | **$0.8984 \pm 0.015$** |
+| 🥈 | **Ridge Regression ($L_2$)** | $0.9064$ | $0.9027$ | $4.0306$ | $5.0436$ | $0.8984 \pm 0.015$ |
+| 🥉 | **Lasso Regression ($L_1$)** | $0.9062$ | $0.9025$ | $4.0390$ | $5.0500$ | $0.8984 \pm 0.015$ |
+| 4 | **Gradient Boosting Regressor** | $0.8663$ | $0.8610$ | $4.7634$ | $6.0291$ | $0.8681 \pm 0.012$ |
+| 5 | **Random Forest Regressor** | $0.8499$ | $0.8440$ | $5.0829$ | $6.3867$ | $0.8532 \pm 0.016$ |
+| 6 | **Decision Tree Regressor** | $0.7758$ | $0.7669$ | $6.1485$ | $7.8065$ | $0.7804 \pm 0.040$ |
+
+### 🧮 Mathematical Model Equation
+$$\widehat{\text{Exam\_Score}} = 3.4209 + 4.7639 \cdot \text{Study\_Hours} + 0.3795 \cdot \text{Attendance} + 1.9669 \cdot \text{Assignments\_Completed}$$
 
 ---
 
-## 🎯 Phase 1: Problem Understanding
-- **Objective:** Build an intelligent ML model capable of predicting student academic performance (`Exam_Score`).
-- **Predictive Factors:**
-  - `Study_Hours`: Weekly independent study hours
-  - `Attendance`: Semester class attendance percentage
-  - `Assignments_Completed`: Completed coursework assignments (out of 10)
-  - `Exam_Score`: Summative academic outcome (0-100 scale)
-- **Expected Outcome:** Accurate performance forecasting, early risk detection, and proactive intervention support.
+## 🌐 Deploying to Vercel
 
----
+### Option 1: Automatic 1-Click Import via Vercel Dashboard
+1. Push this repository to your GitHub account (`https://github.com/Abhin1122/...`).
+2. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+3. Select your repository. Vercel will automatically detect `vercel.json` and deploy immediately.
 
-## 📦 Phase 2: Data Collection & Deliverables
-
-### ✅ Deliverable 1: Dataset Successfully Imported
-- **File:** `data/student_performance_data.csv`
-- **File Size:** 7,578 bytes (7.40 KB)
-- **Integrity Hash (MD5):** `8cd90c8c60a66216797a9b7c8f0f67da`
-
-### ✅ Deliverable 2: Dataset Dimensions Documented
-- **Sample Count (Rows):** `400` instances
-- **Feature Count (Columns):** `4` columns (`Study_Hours`, `Attendance`, `Assignments_Completed`, `Exam_Score`)
-- **Total Data Points:** `1,600`
-- **Completeness:** `100%` (0 missing values, 0 duplicate records, 0 outliers)
-
-### Statistical Highlights
-| Feature | Type | Mean | Std Dev | Min | Median | Max | Correlation with `Exam_Score` |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| `Study_Hours` | float64 | 5.45 | 2.64 | 1.05 | 5.61 | 9.91 | **+0.8088** |
-| `Attendance` | float64 | 74.99 | 14.69 | 50.54 | 75.16 | 99.99 | **+0.3161** |
-| `Assignments_Completed` | int64 | 4.90 | 3.21 | 0.00 | 5.00 | 10.00 | **+0.4229** |
-| `Exam_Score` *(Target)* | float64 | 67.35 | 16.33 | 24.38 | 66.89 | 100.00 | **1.0000** |
-
----
-
-## 🚀 How to Run
-
-### 1. Execute the Data Collection & Profiling Pipeline
+### Option 2: Deploy via Vercel CLI
 ```bash
-python src/data_collection.py
+# In the project directory:
+npx vercel
 ```
-This script will re-verify the dataset, calculate all statistical metrics, export `reports/data_summary.csv` and `reports/data_collection_audit.json`, and regenerate all plots in `reports/figures/`.
 
-### 2. Launch the Interactive Notebook
-Open `notebooks/NOVORA_Phase1_Phase2_Data_Collection.ipynb` in VSCode, Jupyter Notebook, or JupyterLab.
+---
+
+## 🚀 Local Reproduction & Execution
+
+### 1. Run Complete Machine Learning Pipeline
+```bash
+# Phase 2: Ingestion & Profiling
+py -3 src/data_collection.py
+
+# Phase 3: Preprocessing & Scaling
+py -3 src/preprocessing.py
+
+# Phase 4: Exploratory Data Analysis
+py -3 src/eda.py
+
+# Phase 5: Feature Engineering
+py -3 src/feature_engineering.py
+
+# Phase 6 & 7: Model Training & Evaluation
+py -3 src/model_training.py
+```
+
+### 2. Launch Local Web Application
+```bash
+# Option A: Python Built-in Web Server
+py -3 -m http.server 3000 --directory public
+
+# Option B: Node.js / npx
+npx serve public
+```
+Visit `http://localhost:3000` in your browser.
