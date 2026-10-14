@@ -1,0 +1,129 @@
+{
+    "project_name": "NOVORA: Intelligent Learning Analytics and Student Success Prediction Framework",
+    "phase": "Phase 2 - Data Collection & Ingestion",
+    "dataset_file": "student_performance_data.csv",
+    "audit_metrics": {
+        "dimensions": {
+            "rows": 400,
+            "columns": 4,
+            "total_elements": 1600
+        },
+        "memory_usage_kb": 12.63,
+        "duplicate_rows": 0,
+        "total_nulls": 0,
+        "schema": [
+            {
+                "Feature Name": "Study_Hours",
+                "Data Type": "float64",
+                "Type Category": "Numeric (Continuous)",
+                "Non-Null Count": 400,
+                "Missing Count": 0,
+                "Unique Values": 319
+            },
+            {
+                "Feature Name": "Attendance",
+                "Data Type": "float64",
+                "Type Category": "Numeric (Continuous)",
+                "Non-Null Count": 400,
+                "Missing Count": 0,
+                "Unique Values": 383
+            },
+            {
+                "Feature Name": "Assignments_Completed",
+                "Data Type": "int64",
+                "Type Category": "Numeric (Discrete)",
+                "Non-Null Count": 400,
+                "Missing Count": 0,
+                "Unique Values": 11
+            },
+            {
+                "Feature Name": "Exam_Score",
+                "Data Type": "float64",
+                "Type Category": "Numeric (Continuous)",
+                "Non-Null Count": 400,
+                "Missing Count": 0,
+                "Unique Values": 377
+            }
+        ]
+    },
+    "descriptive_statistics": [
+        {
+            "Feature": "Study_Hours",
+            "Count": 400,
+            "Mean": 5.448,
+            "Std Dev": 2.644,
+            "Median": 5.605,
+            "Mode": 1.41,
+            "Min": 1.05,
+            "Q25 (25%)": 3.175,
+            "Q50 (Median)": 5.605,
+            "Q75 (75%)": 7.73,
+            "Max": 9.91,
+            "Range": 8.86,
+            "IQR": 4.555,
+            "Skewness": -0.021,
+            "Kurtosis": -1.249,
+            "IQR Outliers": 0
+        },
+        {
+            "Feature": "Attendance",
+            "Count": 400,
+            "Mean": 74.986,
+            "Std Dev": 14.69,
+            "Median": 75.155,
+            "Mode": 80.91,
+            "Min": 50.54,
+            "Q25 (25%)": 62.092,
+            "Q50 (Median)": 75.155,
+            "Q75 (75%)": 88.028,
+            "Max": 99.99,
+            "Range": 49.45,
+            "IQR": 25.935,
+            "Skewness": 0.044,
+            "Kurtosis": -1.243,
+            "IQR Outliers": 0
+        },
+        {
+            "Feature": "Assignments_Completed",
+            "Count": 400,
+            "Mean": 4.902,
+            "Std Dev": 3.209,
+            "Median": 5.0,
+            "Mode": 6.0,
+            "Min": 0.0,
+            "Q25 (25%)": 2.0,
+            "Q50 (Median)": 5.0,
+            "Q75 (75%)": 8.0,
+            "Max": 10.0,
+            "Range": 10.0,
+            "IQR": 6.0,
+            "Skewness": -0.021,
+            "Kurtosis": -1.247,
+            "IQR Outliers": 0
+        },
+        {
+            "Feature": "Exam_Score",
+            "Count": 400,
+            "Mean": 67.349,
+            "Std Dev": 16.328,
+            "Median": 66.885,
+            "Mode": 100.0,
+            "Min": 24.38,
+            "Q25 (25%)": 55.59,
+            "Q50 (Median)": 66.885,
+            "Q75 (75%)": 79.512,
+            "Max": 100.0,
+            "Range": 75.62,
+            "IQR": 23.922,
+            "Skewness": -0.049,
+            "Kurtosis": -0.586,
+            "IQR Outliers": 0
+        }
+    ],
+    "correlation_with_target": {
+        "Study_Hours": 0.8088001313442894,
+        "Attendance": 0.3160594547558684,
+        "Assignments_Completed": 0.42290438039599576,
+        "Exam_Score": 1.0
+    }
+}
