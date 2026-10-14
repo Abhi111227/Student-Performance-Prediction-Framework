@@ -1,0 +1,31 @@
+{
+    "phase": "Phase 5: Feature Engineering",
+    "engineered_features": [
+        {
+            "name": "Study_Attendance_Index",
+            "formula": "(Study_Hours * Attendance) / 100.0",
+            "description": "Composite engagement metric combining weekly independent hours with class presence rate.",
+            "correlation_with_target": 0.8506
+        },
+        {
+            "name": "Assignment_Rate",
+            "formula": "Assignments_Completed / 10.0",
+            "description": "Normalized assignment completion fraction (0.0 to 1.0).",
+            "correlation_with_target": 0.4212
+        },
+        {
+            "name": "Study_Assignment_Product",
+            "formula": "Study_Hours * (Assignments_Completed + 1)",
+            "description": "Interaction proxy assessing compounded study diligence and coursework practice.",
+            "correlation_with_target": 0.7737
+        }
+    ],
+    "train_shape": [
+        320,
+        7
+    ],
+    "test_shape": [
+        80,
+        7
+    ]
+}
