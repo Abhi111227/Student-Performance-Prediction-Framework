@@ -1,0 +1,42 @@
+{
+    "phase": "Phase 3: Data Preprocessing",
+    "split_ratio": {
+        "train": 0.8,
+        "test": 0.2
+    },
+    "random_state": 42,
+    "sample_counts": {
+        "total": 400,
+        "train": 320,
+        "test": 80
+    },
+    "features": [
+        "Study_Hours",
+        "Attendance",
+        "Assignments_Completed"
+    ],
+    "target": "Exam_Score",
+    "scaler_type": "StandardScaler",
+    "scaler_means": {
+        "Study_Hours": 5.4519375000000005,
+        "Attendance": 74.87043750000001,
+        "Assignments_Completed": 4.9
+    },
+    "scaler_scales": {
+        "Study_Hours": 2.666398319098958,
+        "Attendance": 14.429496454609694,
+        "Assignments_Completed": 3.2078029864690882
+    },
+    "train_target_stats": {
+        "mean": 67.44796875,
+        "std": 16.28624370766947,
+        "min": 24.38,
+        "max": 100.0
+    },
+    "test_target_stats": {
+        "mean": 66.9555,
+        "std": 16.589856585244714,
+        "min": 25.01,
+        "max": 100.0
+    }
+}
